@@ -1,0 +1,27 @@
+{
+    "name": "glitchr/omnipost",
+    "type": "library",
+    "description": "Omnipost: one contract for publishing a post - a reel, a picture, a carousel - on the social networks, reading one's own feed, and the capabilities each network imposes - and its Symfony bundle.",
+    "keywords": ["social", "publishing", "instagram", "youtube", "reels", "omnipost"],
+    "license": "LGPL-3.0-or-later",
+    "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
+    "require": {
+        "php": ">=8.2",
+        "symfony/http-client-contracts": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/http-client": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0"
+    },
+    "autoload": {
+        "psr-4": {"Omnipost\\": ""},
+        "exclude-from-classmap": ["/Tests/", "/docker/"]
+    },
+    "autoload-dev": {
+        "psr-4": {"Omnipost\\Tests\\": "Tests/"}
+    },
+    "config": {"sort-packages": true}
+}

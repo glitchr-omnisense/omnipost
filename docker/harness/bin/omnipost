@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+
+require '/harness/vendor/autoload.php';
+
+exit(Omnipost\Harness\Console::create()->run());

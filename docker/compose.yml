@@ -1,0 +1,32 @@
+# glitchr/omnipost with every provider package, your tokens in .env:
+#
+#   cp .env.dist .env                                          # fill in the tokens at hand
+#   docker compose run --rm omnipost providers                 # which providers are installed and configured
+#   docker compose run --rm omnipost capabilities instagram    # what the network accepts (no token needed)
+#   docker compose run --rm omnipost account instagram
+#   docker compose run --rm omnipost feed youtube --limit 5
+#   docker compose run --rm omnipost validate instagram https://site.example/reel.mp4 "Caption" --duration 42 --width 1080 --height 1920
+#   docker compose run --rm omnipost publish instagram https://site.example/reel.mp4 "Caption" --tag violin
+#   docker compose run --rm omnipost status instagram 17890...
+#   docker compose run --rm omnipost refresh instagram         # the new token, as JSON
+#   docker compose run --rm omnipost test                      # every package's tests
+#
+# Providers come from GitHub (branch 1.x) unless their checkout sits under
+# OMNIPOST_PLUGINS (set it to ../.. in .env when this core sits in the
+# workspace beside them): then that checkout is what runs.
+name: omnipost-harness
+
+services:
+  omnipost:
+    build: .
+    image: glitchr/omnipost-harness
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ..:/omnipost/core
+      - ${OMNIPOST_PLUGINS:-./plugins}:/omnipost/plugins:ro
+      - harness:/harness
+
+volumes:
+  harness:
