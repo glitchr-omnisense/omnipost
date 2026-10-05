@@ -42,8 +42,9 @@ but the networks' own terms.
 
 This package holds the contract (`PublisherInterface`, `FeedInterface`, `ProviderFactory`,
 `Registry`, `Validator`), the models (`Post`, `Media`, `Variant`, `Publication`, `Feed`,
-`FeedItem`, `Account`, `Token`, `Capabilities`, `Violation`) and the Symfony bundle. Each network
-is a package of its own:
+`FeedItem`, `Account`, `Token`, `Capabilities`, `Violation`) and a bridge for Symfony. It needs no
+framework: it requires nothing but `symfony/http-client-contracts`, each provider package
+`symfony/http-client`. Each network is a package of its own:
 
 | Package | Network |
 |---|---|
@@ -59,8 +60,41 @@ distributor - and has no implementation yet.
 composer require glitchr/omnipost omnipost/instagram omnipost/youtube
 ```
 
+## Plain PHP
+
+```php
+require __DIR__.'/vendor/autoload.php';
+
+use Omnipost\Instagram\InstagramProviderFactory;
+use Omnipost\Registry;
+use Omnipost\Validator;
+use Omnipost\YouTube\YouTubeProviderFactory;
+use Symfony\Component\HttpClient\HttpClient;
+
+$http = HttpClient::create();
+$registry = new Registry([new InstagramProviderFactory($http), new YouTubeProviderFactory($http)], [
+    'instagram' => ['factory' => 'instagram', 'options' => ['access_token' => '...']],
+    'youtube' => ['factory' => 'youtube', 'options' => ['api_key' => '...', 'channel_id' => 'UC...']],
+]);
+$registry->publishers();   // the providers that publish
+$registry->feeds();        // the ones that have a feed
+
+foreach ($registry->publishers() as $publisher) {
+    (new Validator())->validate($post->for($publisher->getPlatform()), $publisher->capabilities());   // [] or what would be refused
+}
+```
+
+A factory takes the HTTP client to call with - the application's, a `MockHttpClient` in a test -
+and makes its own when given none. A whole script that runs as it is, and the rest:
+[docs/installation.md](docs/installation.md). No class of a framework is loaded on the way:
+`Tests/BareTest.php` checks it in a process of its own, and so does
+`docker compose run --rm omnipost bare`.
+
 ## Symfony
 
+In a Symfony application a bundle does the wiring; its components (`symfony/config`,
+`symfony/dependency-injection`, `symfony/http-kernel`) are not required by this package: the
+application has them ([docs/symfony.md](docs/symfony.md)).
 `Omnipost\Bridge\Symfony\OmnipostBundle`: every `omnipost/*` provider installed registered,
 `Omnipost\Registry` and `Omnipost\Validator` autowired, and each configured provider injectable
 by its name.
@@ -85,17 +119,6 @@ token. So a site boots before its accounts are connected; to know whether one is
 `$registry->create('instagram', ['access_token' => $stored])`.
 
 An application's own `ProviderFactoryInterface` is registered too (autoconfigured).
-
-## Without Symfony
-
-```php
-$registry = new Registry([new InstagramProviderFactory($http), new YouTubeProviderFactory($http)], [
-    'instagram' => ['factory' => 'instagram', 'options' => ['access_token' => '...']],
-    'youtube' => ['factory' => 'youtube', 'options' => ['api_key' => '...', 'channel_id' => 'UC...']],
-]);
-$registry->publishers();   // the providers that publish
-$registry->feeds();        // the ones that have a feed
-```
 
 ## Per network, what it takes
 
@@ -128,10 +151,17 @@ docker compose run --rm omnipost status instagram 17890...
 docker compose run --rm omnipost refresh instagram                   # the new token, as JSON
 docker compose run --rm omnipost authorize youtube http://localhost/callback
 docker compose run --rm omnipost exchange youtube 4/0A... http://localhost/callback   # prints the refresh token
+docker compose run --rm omnipost bare                                # plain PHP: no bundle, no container, and what PHP loaded
 docker compose run --rm omnipost test                                # every package's tests
 ```
 
 `validate` and `publish` measure what they can (the type and size the server announces, a local
 `--file`); the duration and the size in pixels are given with `--duration`, `--width`, `--height`.
+
+## Documentation
+
+- [Installation and first calls](docs/installation.md): plain PHP first
+- [Symfony](docs/symfony.md)
+- [The Docker harness](docs/harness.md)
 
 License: LGPL-3.0-or-later.
