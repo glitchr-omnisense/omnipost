@@ -1,0 +1,7 @@
+{
+  "kind": "youtube#videoListResponse",
+  "items": [
+    {"id": "shortA", "contentDetails": {"duration": "PT58S"}, "statistics": {"viewCount": "1200", "likeCount": "80", "commentCount": "3"}},
+    {"id": "longB", "contentDetails": {"duration": "PT1H2M3S"}, "statistics": {"viewCount": "50"}}
+  ]
+}

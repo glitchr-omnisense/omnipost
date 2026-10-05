@@ -1,0 +1,14 @@
+{
+  "kind": "youtube#playlistItemListResponse",
+  "nextPageToken": "CAUQAA",
+  "items": [
+    {
+      "snippet": {"title": "Strauss, Sonata", "publishedAt": "2026-09-30T18:05:00Z", "resourceId": {"videoId": "shortA"}, "thumbnails": {"high": {"url": "https://i.ytimg.com/vi/shortA/hqdefault.jpg"}, "maxres": {"url": "https://i.ytimg.com/vi/shortA/maxresdefault.jpg"}}},
+      "contentDetails": {"videoId": "shortA", "videoPublishedAt": "2026-09-30T18:00:00Z"}
+    },
+    {
+      "snippet": {"title": "The whole concert", "publishedAt": "2026-09-01T18:00:00Z", "resourceId": {"videoId": "longB"}, "thumbnails": {"high": {"url": "https://i.ytimg.com/vi/longB/hqdefault.jpg"}}},
+      "contentDetails": {"videoId": "longB", "videoPublishedAt": "2026-09-01T18:00:00Z"}
+    }
+  ]
+}

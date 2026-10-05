@@ -1,0 +1,12 @@
+{
+  "kind": "youtube#channelListResponse",
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "id": "UCabc",
+      "snippet": {"title": "Claire", "customUrl": "@claireviolin", "thumbnails": {"high": {"url": "https://yt3.example/c.jpg"}}},
+      "statistics": {"subscriberCount": "4200", "videoCount": "36", "hiddenSubscriberCount": false},
+      "contentDetails": {"relatedPlaylists": {"uploads": "UUabc"}}
+    }
+  ]
+}

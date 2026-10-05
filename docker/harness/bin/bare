@@ -1,0 +1,135 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Omnipost in bare PHP: no bundle, no container, no console component. The
+ * registry is built by hand from the provider packages installed, each
+ * provider says what it does, two posts are checked against what each
+ * network accepts - a vertical reel of 42 seconds, a landscape one of twelve
+ * minutes: nothing is sent - and YouTube is asked for the channel and its
+ * latest videos; then the script lists what PHP loaded on the way.
+ *
+ *   docker compose run --rm omnipost bare              # exits 1 when a class of a framework was loaded
+ *   docker compose run --rm omnipost bare --recorded   # YouTube on the answers kept in recorded/ instead of the calls
+ *   docker compose run --rm omnipost bare --json       # the same, whole: every class loaded, every file since the autoloader
+ *
+ * Without --recorded the providers are those of .env, and YouTube is asked
+ * only when YOUTUBE_API_KEY and YOUTUBE_CHANNEL_ID are set. The answers in
+ * recorded/ were written in the shape the Data API v3 documents (those of
+ * omnipost/youtube's tests): the channel and its videos are made up.
+ *
+ * OMNIPOST_AUTOLOAD names another autoloader than the harness's.
+ */
+
+use Omnipost\FeedInterface;
+use Omnipost\Model\FeedItem;
+use Omnipost\Model\Media;
+use Omnipost\Model\Post;
+use Omnipost\Model\Variant;
+use Omnipost\Platform;
+use Omnipost\PublisherInterface;
+use Omnipost\Registry;
+use Omnipost\Validator;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+
+require getenv('OMNIPOST_AUTOLOAD') ?: '/harness/vendor/autoload.php';
+// What Composer requires for every package installed (their autoload.files: Twig's functions, where Twig is
+// installed) is loaded before this line, whatever the script does: not counted below.
+$autoloaded = get_included_files();
+
+$recorded = \in_array('--recorded', $argv, true);
+$http = !$recorded ? null : new MockHttpClient(static function (string $method, string $url): MockResponse {
+    $file = match ((string) parse_url($url, \PHP_URL_PATH)) {
+        '/youtube/v3/channels' => 'youtube-channels.json',
+        '/youtube/v3/playlistItems' => 'youtube-playlist-items.json',
+        '/youtube/v3/videos' => 'youtube-videos.json',
+        default => null,
+    };
+
+    return null !== $file
+        ? new MockResponse((string) file_get_contents(__DIR__.'/../recorded/'.$file), ['response_headers' => ['Content-Type' => 'application/json']])
+        : new MockResponse('{"error":{"code":404,"message":"Not found","errors":[{"reason":"notFound"}]}}', ['http_code' => 404, 'response_headers' => ['Content-Type' => 'application/json']]);
+});
+
+$factories = [];
+foreach (require __DIR__.'/../plugins.php' as [, $class]) {
+    if (class_exists($class)) {
+        $factories[] = new $class($http ??= HttpClient::create(['timeout' => 30]));
+    }
+}
+$installed = array_map(static fn ($factory) => $factory->getName(), $factories);
+// Every installed provider, its tokens set or not: what needs none works without.
+$config = array_filter(require __DIR__.'/../config/providers.php', static fn (array $provider) => \in_array($provider['factory'], $installed, true));
+$config = array_map(static fn (array $provider) => ['factory' => $provider['factory'], 'options' => $provider['options']], $config);
+if ($recorded) {
+    // Manifestly not credentials: nothing is called.
+    $config = array_intersect_key(['instagram' => ['factory' => 'instagram', 'options' => []], 'youtube' => ['factory' => 'youtube', 'options' => ['api_key' => 'youtube_test_not_a_real_key', 'channel_id' => 'UCabc']]], $config);
+}
+$registry = new Registry($factories, $config);
+
+$report = ['recorded' => $recorded, 'factories' => $registry->factories(), 'providers' => [], 'posts' => [], 'youtube' => null];
+foreach ($registry->all() as $name => $provider) {
+    $report['providers'][$name] = ['platform' => $provider->getPlatform()->value, 'publishes' => $provider instanceof PublisherInterface, 'feed' => $provider instanceof FeedInterface];
+}
+
+// One canonical post and its variant for YouTube, checked against what each network accepts: nothing is sent.
+$validator = new Validator();
+$posts = [
+    'a vertical reel of 42 seconds' => Post::reel(Media::video('https://site.example/reel.mp4', null, 42.0, 1080, 1920), 'Strauss, tonight.', null, ['violin'])->withVariant(new Variant(Platform::YOUTUBE, title: 'Strauss, Sonata')),
+    'a landscape reel of twelve minutes' => Post::reel(Media::video('https://site.example/concert.mp4', null, 720.0, 1920, 1080), 'The whole concert.'),
+];
+foreach ($posts as $what => $post) {
+    foreach ($registry->publishers() as $publisher) {
+        $report['posts'][$what][$publisher->getName()] = array_map('strval', $validator->validate($post->for($publisher->getPlatform()), $publisher->capabilities()));
+    }
+}
+
+$set = static fn (string $key): bool => false !== getenv($key) && '' !== getenv($key);
+if ($registry->has('youtube') && ($recorded || ($set('YOUTUBE_API_KEY') && $set('YOUTUBE_CHANNEL_ID')))) {
+    $youtube = $registry->get('youtube');
+    $account = $youtube->account();
+    $feed = $youtube->feed(null, 2);
+    $report['youtube'] = [
+        'account' => ['id' => $account->id, 'username' => $account->username, 'name' => $account->name, 'url' => $account->url, 'followers' => $account->followers, 'posts' => $account->posts],
+        'items' => array_map(static fn (FeedItem $item) => ['id' => $item->id, 'kind' => $item->kind->value, 'caption' => $item->caption, 'published' => $item->publishedAt?->format('Y-m-d'), 'duration' => $item->duration, 'views' => $item->views, 'permalink' => $item->permalink], $feed->items),
+        'next' => $feed->next,
+    ];
+}
+
+// What PHP loaded to get there: the proof that no framework was needed.
+$report['symbols'] = [...get_declared_classes(), ...get_declared_interfaces(), ...get_declared_traits()];
+$report['files'] = array_values(array_diff(get_included_files(), $autoloaded));
+$framework = array_values(preg_grep('~^(?:Symfony\\\\Component\\\\(?:DependencyInjection|Config|HttpKernel|HttpFoundation)|Symfony\\\\Bundle|Symfony\\\\Bridge|Doctrine|Twig)\\\\~', $report['symbols']));
+$symfony = array_values(array_unique(array_map(static fn (string $s) => implode('\\', \array_slice(explode('\\', $s), 0, 3)), preg_grep('~^Symfony\\\\(?!Polyfill)~', $report['symbols']))));
+sort($symfony);
+
+if (\in_array('--json', $argv, true)) {
+    echo json_encode($report, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), "\n";
+    exit($framework ? 1 : 0);
+}
+
+echo "Omnipost in bare PHP: the registry built by hand, no bundle, no container.\n\n";
+foreach ($report['providers'] as $name => $provider) {
+    printf("  %-10s %s\n", $name, implode(', ', array_keys(array_filter(['publishes' => $provider['publishes'], 'has a feed' => $provider['feed']]))));
+}
+if (!$report['providers']) {
+    echo "  no omnipost/* provider package is installed\n";
+}
+foreach ($report['posts'] as $what => $networks) {
+    echo "\nChecked before anything is sent, ", $what, ":\n";
+    foreach ($networks as $name => $violations) {
+        printf("  %-10s %s\n", $name, $violations ? implode("\n             ", $violations) : 'accepted');
+    }
+}
+if ($youtube = $report['youtube']) {
+    echo "\nomnipost/youtube, ", $recorded ? 'from the answers kept in recorded/' : 'asked of the Data API', ":\n";
+    printf("  %s (%s), %s - %s subscribers, %s videos\n", $youtube['account']['name'], $youtube['account']['username'], $youtube['account']['url'], $youtube['account']['followers'] ?? '?', $youtube['account']['posts'] ?? '?');
+    foreach ($youtube['items'] as $item) {
+        printf("  %s  %-5s %s, %s, %s views\n              %s\n", $item['published'], $item['kind'], $item['caption'], null === $item['duration'] ? '?' : gmdate($item['duration'] >= 3600 ? 'G:i:s' : 'i:s', (int) $item['duration']), $item['views'] ?? '?', $item['permalink']);
+    }
+}
+echo "\nLoaded from Symfony: ", implode(', ', $symfony) ?: 'nothing', "\n";
+echo 'Classes of a framework (DependencyInjection, Config, HttpKernel, HttpFoundation, a bundle, a bridge, Doctrine, Twig): ', $framework ? implode(', ', $framework) : 'none', "\n";
+exit($framework ? 1 : 0);

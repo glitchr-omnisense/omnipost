@@ -9,6 +9,7 @@
 #   docker compose run --rm omnipost publish instagram https://site.example/reel.mp4 "Caption" --tag violin
 #   docker compose run --rm omnipost status instagram 17890...
 #   docker compose run --rm omnipost refresh instagram         # the new token, as JSON
+#   docker compose run --rm omnipost bare                      # plain PHP: no bundle, no container, and what PHP loaded
 #   docker compose run --rm omnipost test                      # every package's tests
 #
 # Providers come from GitHub (branch 1.x) unless their checkout sits under
