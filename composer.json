@@ -16,6 +16,13 @@
         "symfony/http-client": "^6.4|^7.0|^8.0",
         "symfony/http-kernel": "^6.4|^7.0|^8.0"
     },
+    "suggest": {
+        "omnipost/instagram": "Instagram: the feed, pictures, carousels, reels and stories, the 60-day token's refresh",
+        "omnipost/youtube": "YouTube: the channel's videos with a key, videos and Shorts uploaded through OAuth",
+        "symfony/config": "In a Symfony application: the configuration of Omnipost\\Bridge\\Symfony\\OmnipostBundle",
+        "symfony/dependency-injection": "In a Symfony application: the services of Omnipost\\Bridge\\Symfony\\OmnipostBundle",
+        "symfony/http-kernel": "In a Symfony application: Omnipost\\Bridge\\Symfony\\OmnipostBundle itself"
+    },
     "autoload": {
         "psr-4": {"Omnipost\\": ""},
         "exclude-from-classmap": ["/Tests/", "/docker/"]
