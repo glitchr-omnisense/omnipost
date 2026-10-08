@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Omnipost: one contract for publishing a post - a reel, a picture, a carousel - on the social networks, reading one's own feed, and the capabilities each network imposes - and its Symfony bundle.",
     "keywords": ["social", "publishing", "instagram", "youtube", "reels", "omnipost"],
-    "license": "LGPL-3.0-or-later",
+    "license": "MIT",
     "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
     "require": {
         "php": ">=8.2",
