@@ -164,4 +164,17 @@ docker compose run --rm omnipost test                                # every pac
 - [Symfony](docs/symfony.md)
 - [The Docker harness](docs/harness.md)
 
+## Responsibility
+
+`glitchr/omnipost` and its `omnipost/*` providers are independent, unofficial clients: none is
+affiliated with, endorsed by or sponsored by the services it reaches. Each service keeps its own
+terms (app review and permissions, tokens, quotas, content and branding rules), named with a link in
+the "Responsibility" section of the README of each provider that reaches one. The MIT licence covers
+this code only and grants no right to any service or to its data.
+
+Whoever installs and runs these packages is responsible for complying with those terms, for
+obtaining whatever they require, and for any use made of what they return. The authors publish them
+free of charge, make no commercial use of them, and accept no liability for how they are used (see
+[LICENSE](LICENSE)).
+
 License: MIT since 2026-10-09; earlier versions remain published under LGPL-3.0-or-later.
