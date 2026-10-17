@@ -1,7 +1,11 @@
-# glitchr/omnipost
+# omniscient/omnipost
 
 One contract for publishing a post on the social networks and reading one's own feed - the
 Omnibus of publication, beside glitchr/omnitrade (payments) and glitchr/omnibus (shipping).
+
+Published as `omniscient/omnipost` (formerly `glitchr/omnipost`, which this package replaces: a
+`composer.json` that still requires the old name keeps resolving to this package, never both).
+`omniscient/` is the vendor of every family's core; the providers keep theirs (`omnipost/instagram`...).
 
 ```php
 $post = Post::reel(Media::video($publicUrl, $path, 42.0, 1080, 1920), 'Strauss, tonight.', null, ['violin'])
@@ -57,7 +61,7 @@ distributor - and has no implementation yet.
 ## Install
 
 ```sh
-composer require glitchr/omnipost omnipost/instagram omnipost/youtube
+composer require omniscient/omnipost omnipost/instagram omnipost/youtube
 ```
 
 ## Plain PHP
@@ -166,7 +170,7 @@ docker compose run --rm omnipost test                                # every pac
 
 ## Responsibility
 
-`glitchr/omnipost` and its `omnipost/*` providers are independent, unofficial clients: none is
+`omniscient/omnipost` and its `omnipost/*` providers are independent, unofficial clients: none is
 affiliated with, endorsed by or sponsored by the services it reaches. Each service keeps its own
 terms (app review and permissions, tokens, quotas, content and branding rules), named with a link in
 the "Responsibility" section of the README of each provider that reaches one. The MIT licence covers
