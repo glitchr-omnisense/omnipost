@@ -1,4 +1,4 @@
-# omniscient/omnipost with every provider package, your tokens in .env:
+# omnisense/omnipost with every provider package, your tokens in .env:
 #
 #   cp .env.dist .env                                          # fill in the tokens at hand
 #   docker compose run --rm omnipost providers                 # which providers are installed and configured
@@ -20,7 +20,7 @@ name: omnipost-harness
 services:
   omnipost:
     build: .
-    image: omniscient/omnipost-harness
+    image: omnisense/omnipost-harness
     env_file:
       - path: .env
         required: false

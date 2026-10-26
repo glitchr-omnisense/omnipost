@@ -1,7 +1,7 @@
 # Installation and first calls
 
 ```sh
-composer require omniscient/omnipost omnipost/instagram omnipost/youtube
+composer require omnisense/omnipost omnipost/instagram omnipost/youtube
 ```
 
 PHP 8.2 or later.

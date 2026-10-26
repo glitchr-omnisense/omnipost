@@ -1,5 +1,5 @@
 {
-    "name": "omniscient/omnipost",
+    "name": "omnisense/omnipost",
     "type": "library",
     "description": "Omnipost: one contract for publishing a post - a reel, a picture, a carousel - on the social networks, reading one's own feed, and the capabilities each network imposes - and its Symfony bundle.",
     "keywords": ["social", "publishing", "instagram", "youtube", "reels", "omnipost"],
@@ -17,6 +17,7 @@
         "symfony/http-kernel": "^6.4|^7.0|^8.0"
     },
     "replace": {
+        "omniscient/omnipost": "self.version",
         "glitchr/omnipost": "self.version"
     },
     "suggest": {
