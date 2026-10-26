@@ -1,15 +1,31 @@
+---
+title: Installation
+order: 10
+---
+
 # Installation and first calls
 
 ```sh
 composer require omnisense/omnipost omnipost/instagram omnipost/youtube
 ```
 
-PHP 8.2 or later.
+## Requirements
 
-Omnipost needs no framework. The core requires nothing but `symfony/http-client-contracts`, each
-provider package `symfony/http-client`: two libraries that stand alone. It runs the same in plain
-PHP, in a worker, in Laravel or Slim, and in Symfony, where a bundle does the wiring
-([Symfony](symfony.md)).
+- PHP 8.2 or later, with `mbstring` (the validator measures captions and titles with
+  `mb_strlen()`).
+
+> [!WARNING]
+> Known defect: `composer.json` does not require `ext-mbstring`, where the validator calls `mb_strlen()`: on a PHP built without it, validating a post is a fatal error.
+
+- `omnisense/omnipost` requires `symfony/http-client-contracts` (^3.0) and nothing else.
+- Each provider package (`omnipost/instagram`, `omnipost/youtube`) requires `omnisense/omnipost` and
+  `symfony/http-client` (^6.4, ^7.0 or ^8.0), a library that stands alone and loads no framework.
+- For the Symfony bundle: `symfony/config`, `symfony/dependency-injection` and
+  `symfony/http-kernel` (6.4, 7 or 8). They are suggested, not required: a Symfony application has
+  them.
+
+Omnipost runs the same in plain PHP, in a worker, in Laravel or Slim, and in Symfony, where a bundle
+does the wiring ([Symfony](symfony.md)).
 
 ## Plain PHP
 
@@ -71,8 +87,8 @@ youtube    accepted
 2026-09-30 reel Strauss, Sonata (58 s, 1200 views) https://www.youtube.com/watch?v=shortA
 ```
 
-(run on 2026-10-05 in an empty directory, after the `composer require` above; the channel and its
-video are made up - every network asks for an account's key or token, so the script answers in
+(run on 2026-10-05 in an empty directory, after the `composer require` above, and again on
+2026-10-26 on the packages' checkouts with the same output; the channel and its video are made up - every network asks for an account's key or token, so the script answers in
 YouTube's place. With `HttpClient::create()`, your key and your channel's id, the same lines read
 the real channel.)
 
@@ -114,7 +130,8 @@ while (!$publication->state->isFinal()) {
 ```
 
 The media must be at a public URL the network can fetch (Instagram), or a local file the provider
-uploads (YouTube: `Media::video($url, $path, ...)`).
+uploads (YouTube: `Media::video($url, $path, ...)`; with no path, YouTube's provider fetches the URL
+itself first). The whole flow, network by network: [Publishing](usage-publishing.md).
 
 ## The tokens stay with the site
 
@@ -134,10 +151,14 @@ and `authorizationUrl()` need none, and a call that needs one throws `InvalidCon
   each provider injectable by its name: see [Symfony](symfony.md). Its components
   (`symfony/config`, `symfony/dependency-injection`, `symfony/http-kernel`) are not required by
   this package: a Symfony application has them.
-- **Any other**: build the `Registry` once, where the framework builds its services (a service
-  provider, a container definition), as the script above does.
+- **Laravel**: there is no bridge package; a service provider builds the registry once:
+  [Laravel](laravel.md).
+- **Any other**: build the `Registry` once, where the framework builds its services (a container
+  definition, a factory), as the script above does.
 
 ## Errors
+
+The whole list, and what each provider maps to which: [Errors](errors.md).
 
 | Exception | When |
 |---|---|

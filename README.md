@@ -164,9 +164,14 @@ docker compose run --rm omnipost test                                # every pac
 
 ## Documentation
 
+- [The manual's home](docs/index.md): what it is, the providers
 - [Installation and first calls](docs/installation.md): plain PHP first
-- [Symfony](docs/symfony.md)
-- [The Docker harness](docs/harness.md)
+- [Symfony](docs/symfony.md), [Laravel](docs/laravel.md)
+- [Concepts](docs/concepts.md): providers and their interfaces, the registry, posts, media, publications, tokens
+- [Publishing](docs/usage-publishing.md), [Validating a post](docs/usage-validation.md), [Reading an account](docs/usage-reading.md), [Tokens and connecting an account](docs/usage-tokens.md)
+- [Configuration reference](docs/configuration.md), [Errors](docs/errors.md), [Testing](docs/testing.md)
+- [The Docker harness](docs/harness.md), [Writing a provider](docs/providers.md)
+- [Verified, and not](docs/verified.md)
 
 ## Responsibility
 

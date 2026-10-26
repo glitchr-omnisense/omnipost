@@ -1,3 +1,8 @@
+---
+title: The Docker harness
+order: 70
+---
+
 # The Docker harness
 
 `docker/` runs this package with every `omnipost/*` provider installed - from GitHub (branch 1.x),
@@ -80,3 +85,16 @@ list.
 
 The image is `php:8.4-cli-alpine` with Composer; the harness's packages live in the `harness`
 volume of the `omnipost-harness` project.
+
+## The entrypoint
+
+`docker/entrypoint.sh` runs `docker/harness/setup.php` first: it writes the harness's
+`composer.json` and `phpunit.xml` in the `harness` volume - this core from its checkout, each
+provider from its checkout under `OMNIPOST_PLUGINS` when one is there, from
+`https://github.com/glitchr-omnisense/omnipost-<slug>.git` (branch 1.x) otherwise. Then
+`composer install` the first time, `composer update` when `composer.json` is newer than the lock,
+and the command: `test` (PHPUnit), `bare`, `composer`, `sh` or `php` as they are, anything else the
+console (`docker/harness/bin/omnipost`, `providers` by default).
+
+The image (`omnisense/omnipost-harness`) is built from `docker/Dockerfile` the first time
+`docker compose run` needs it, and the first run installs the packages, which needs the network.
