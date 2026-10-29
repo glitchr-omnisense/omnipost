@@ -28,6 +28,13 @@ Every exception implements `Omnipost\Exception\OmnipostException` (an interface 
 There is no "unavailable" or "rate limited" class in this family: a network that cannot be reached,
 or asks to slow down, is a `ProviderException` too.
 
+## No secret in a failure
+
+A provider keeps its credentials out of what it throws: the HTTP client's message with a key or a
+token masked (`access_token=***`, `Http\Redaction::text()`), the previous exception a copy of the
+client's (`Redaction::copy()`: the same class and code), and no trace of the chain keeping its
+arguments, where the options, headers and token stood (`zend.exception_ignore_args` off).
+
 ## By provider
 
 Run on 2026-10-26 on mocked answers (the networks' documented error shapes):

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Omnipost\Http\Redaction`: a request's secrets (`secrets()`), a text without them (`text()`), a
+  failure's copy to wrap in its place (`copy()`), a trace without arguments (`withoutArguments()`),
+  for the providers that call with a key or a token.
+
 ### Fixed
 
 - `Post::$link` is written into the caption by a network whose captions make it a link, and
