@@ -61,7 +61,7 @@ final class Validator
                 $v[] = new Violation("$path.height", \sprintf('%d px high, at least %d.', $m->height, $c->minHeight));
             }
         }
-        $text = $post->text();
+        $text = $post->text($c->linkInCaption);
         if (null !== $c->captionMaxLength && mb_strlen($text) > $c->captionMaxLength) {
             $v[] = new Violation('caption', \sprintf('%d characters with the hashtags, at most %d.', mb_strlen($text), $c->captionMaxLength));
         }

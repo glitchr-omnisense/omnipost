@@ -95,7 +95,5 @@ configured one. For YouTube, store the refresh token and pass it as `refresh_tok
 A token that is expired, revoked or refused is an `UnauthorizedException` (`$e->status`,
 `$e->providerCode`): the account must be connected again. Instagram: HTTP 401, error code 190, or
 the subcodes 463 and 467. YouTube: HTTP 401, or the reasons `invalid_grant` (a revoked refresh
-token), `invalid_client`, `unauthorized_client`, `authError`.
+token), `invalid_client`, `unauthorized_client`, `authError`, and a 403 `insufficientPermissions` (a token without the scope the call needs).
 
-> [!WARNING]
-> Known defect: a YouTube token that lacks a permission (HTTP 403, reason `insufficientPermissions`) is a plain `ProviderException`, where `UnauthorizedException`'s docblock covers "lacks a permission: the account must be connected again" (`omnipost/youtube` `Api::decode()`).

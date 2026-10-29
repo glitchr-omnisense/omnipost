@@ -34,6 +34,7 @@ final class Capabilities
         public readonly ?int $minWidth = null,
         public readonly ?int $minHeight = null,
         public readonly bool $scheduling = false,
+        /** the post's link written into its caption (Post::text()), where the network makes it a link */
         public readonly bool $linkInCaption = true,
     ) {
     }

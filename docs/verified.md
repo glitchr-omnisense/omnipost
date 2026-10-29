@@ -43,10 +43,10 @@ checkouts with a `MockHttpClient`.
   private) are what the READMEs say of the networks; the code does not check them.
 - The [Laravel](laravel.md) page was written from the registry's API; it was not run in a Laravel
   application.
-- The known defects found while writing these pages: YouTube's 403 `insufficientPermissions` not an
-  `UnauthorizedException` ([Errors](errors.md#by-provider)); `Post::$link` and
-  `Capabilities::$linkInCaption` read by no provider ([Concepts](concepts.md#posts)); the core did
-  not require `ext-mbstring` though the validator calls `mb_strlen()` (fixed: it does).
+- The defects found while writing these pages, fixed since, each with its test: YouTube's 403
+  `insufficientPermissions` not an `UnauthorizedException` ([Errors](errors.md#by-provider));
+  `Post::$link` and `Capabilities::$linkInCaption` read by no provider ([Concepts](concepts.md#posts));
+  `ext-mbstring` not required by the core.
 
 ## Responsibility
 

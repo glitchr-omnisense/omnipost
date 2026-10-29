@@ -63,8 +63,7 @@ the video's file unreadable, the video's URL answering other than 200, a status 
 that does not exist (404, `videoNotFound`), a channel not found (404, `channelNotFound`), no
 uploads playlist, no token in Google's answer.
 
-> [!WARNING]
-> Known defect: YouTube's 403 `insufficientPermissions` (a token without the scope the call needs) is a `ProviderException`, where `UnauthorizedException` - "the token is dead, or lacks a permission" - is documented for it.
+YouTube's 403 `insufficientPermissions` (a token without the scope the call needs) is an `UnauthorizedException`: the account is connected again with the scope.
 
 ## What to catch
 

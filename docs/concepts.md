@@ -111,8 +111,7 @@ $registry = new Registry(
 | `text(): string` | the caption, a blank line, the hashtags each with one `#`, space-separated; trimmed |
 | `video(): ?Media` | the first video among the media |
 
-> [!WARNING]
-> Known defect: `Post::$link` is read by no provider, where its docblock says the networks that take a link put it where they can; so is `Capabilities::$linkInCaption`. Put the link in the caption.
+`Post::$link` is written into the caption, on its own line before the hashtags, by a network whose captions make it a link (`Capabilities::$linkInCaption`: YouTube's description), and left out by one whose captions do not (Instagram); the validator counts it in the caption's length there.
 
 Publish `$post->for($platform)`, not `$post`: a provider reads the post's own fields, never its
 variants.

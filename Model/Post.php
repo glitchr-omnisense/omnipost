@@ -27,7 +27,7 @@ final class Post
         public readonly ?\DateTimeImmutable $scheduledAt = null,
         public readonly array $variants = [],
         public readonly array $options = [],
-        /** A link to carry (the site's page): networks that take one put it where they can */
+        /** A link to carry (the site's page): written into the caption where the network makes it a link (Capabilities::$linkInCaption: YouTube's description), left out elsewhere (Instagram) */
         public readonly ?string $link = null,
     ) {
     }
@@ -86,11 +86,16 @@ final class Post
     }
 
     /** The caption with the hashtags appended, as most networks want it. */
-    public function text(): string
+    /**
+     * The caption as sent: the caption, the link on its own line when $withLink (a network whose
+     * captions make it a link: Capabilities::$linkInCaption), then the hashtags.
+     */
+    public function text(bool $withLink = false): string
     {
         $tags = array_map(static fn (string $t) => '#'.ltrim($t, '#'), $this->tags);
+        $link = $withLink && null !== $this->link && '' !== $this->link ? "\n\n".$this->link : '';
 
-        return trim($this->caption.($tags ? "\n\n".implode(' ', $tags) : ''));
+        return trim(trim($this->caption).$link.($tags ? "\n\n".implode(' ', $tags) : ''));
     }
 
     public function video(): ?Media
