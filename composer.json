@@ -7,6 +7,7 @@
     "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
     "require": {
         "php": ">=8.2",
+        "ext-mbstring": "*",
         "symfony/http-client-contracts": "^3.0"
     },
     "require-dev": {

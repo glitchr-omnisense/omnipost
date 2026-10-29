@@ -45,9 +45,8 @@ checkouts with a `MockHttpClient`.
   application.
 - The known defects found while writing these pages: YouTube's 403 `insufficientPermissions` not an
   `UnauthorizedException` ([Errors](errors.md#by-provider)); `Post::$link` and
-  `Capabilities::$linkInCaption` read by no provider ([Concepts](concepts.md#posts)); the core does
-  not require `ext-mbstring` though the validator calls `mb_strlen()`
-  ([Installation](installation.md#requirements)).
+  `Capabilities::$linkInCaption` read by no provider ([Concepts](concepts.md#posts)); the core did
+  not require `ext-mbstring` though the validator calls `mb_strlen()` (fixed: it does).
 
 ## Responsibility
 

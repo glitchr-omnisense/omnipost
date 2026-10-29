@@ -14,9 +14,6 @@ composer require omnisense/omnipost omnipost/instagram omnipost/youtube
 - PHP 8.2 or later, with `mbstring` (the validator measures captions and titles with
   `mb_strlen()`).
 
-> [!WARNING]
-> Known defect: `composer.json` does not require `ext-mbstring`, where the validator calls `mb_strlen()`: on a PHP built without it, validating a post is a fatal error.
-
 - `omnisense/omnipost` requires `symfony/http-client-contracts` (^3.0) and nothing else.
 - Each provider package (`omnipost/instagram`, `omnipost/youtube`) requires `omnisense/omnipost` and
   `symfony/http-client` (^6.4, ^7.0 or ^8.0), a library that stands alone and loads no framework.
