@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The core's suite alone (the CI's package job): the contracts, the models, the registry and the share links.
+     The family's harness (docker/) runs it with the providers' suites beside it. -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache"
+         failOnWarning="true" failOnRisky="true">
+    <testsuites>
+        <testsuite name="core"><directory>Tests</directory></testsuite>
+    </testsuites>
+</phpunit>

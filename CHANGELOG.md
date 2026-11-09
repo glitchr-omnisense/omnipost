@@ -4,6 +4,9 @@
 
 ### Added
 
+- CI: `.github/workflows/ci.yml`, glitchr-studio/ci's package job as omnishare had it (the package installed alone,
+  PHPUnit, PHPStan, a consumer install that autoloads `Omnipost\Share\Registry`); `phpunit.xml.dist` (the core's
+  suite, `Tests/`) and `phpstan-baseline.neon`, empty: any error of the paths phpstan.neon analyses fails the job.
 - The share contract, from `omnisense/omnishare` (merged with its history on 2026-11-09): plain
   share links for a page's visitors, with no network script and no cookie, one JSON for Twig, Blade
   and React. `Omnipost\Share\` holds `NetworkInterface`, `Registry` (`defaults()`: Facebook, X,

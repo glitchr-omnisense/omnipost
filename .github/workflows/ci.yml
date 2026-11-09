@@ -1,0 +1,21 @@
+# The package's CI: glitchr-studio/ci's reusable workflow (the PHP 8.4 image, the package installed
+# alone, PHPUnit on phpunit.xml.dist - the core's suite, share links included -, PHPStan on phpstan.neon's
+# paths against phpstan-baseline.neon, empty: any error fails; a consumer install without require-dev).
+# omnisense/omnishare had this job before it merged here (2026-11-09).
+name: ci
+
+on:
+  push:
+    branches: ['1.x']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  package:
+    uses: glitchr-studio/ci/.github/workflows/php-package.yml@main
+    with:
+      smoke-class: 'Omnipost\Share\Registry'

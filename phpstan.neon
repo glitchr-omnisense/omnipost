@@ -1,5 +1,9 @@
 # PHPStan at the highest level on the share links (omnishare's, which had it before the merge):
 # Share/, its two exceptions and its tests. The rest of the core is not analysed yet.
+# phpstan-baseline.neon is empty: nothing is accepted, glitchr-studio/ci's job fails on any error.
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: max
     paths:
