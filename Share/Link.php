@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnishare;
+namespace Omnipost\Share;
 
 /**
  * One network's link for one Shareable, with all a template needs to draw it.

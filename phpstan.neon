@@ -1,0 +1,9 @@
+# PHPStan at the highest level on the share links (omnishare's, which had it before the merge):
+# Share/, its two exceptions and its tests. The rest of the core is not analysed yet.
+parameters:
+    level: max
+    paths:
+        - Share
+        - Exception/InvalidShareableException.php
+        - Exception/UnknownNetworkException.php
+        - Tests/Share

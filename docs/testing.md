@@ -136,9 +136,45 @@ In Symfony, replace `http_client` with a `MockHttpClient` in the test environmen
 (`framework.http_client.mock_response_factory`), or a provider's service
 (`omnipost.provider.<name>`) with `static::getContainer()->set(...)` before it is first used.
 
+## Share links
+
+Share links are strings built from a `Shareable`: test them as strings, with no browser and no
+network.
+
+```php
+use Omnipost\Share\Registry;
+use Omnipost\Share\Shareable;
+use PHPUnit\Framework\TestCase;
+
+final class ArticleShareTest extends TestCase
+{
+    public function testTheArticleIsSharedWithItsPicture(): void
+    {
+        $share = Registry::defaults()->share(
+            new Shareable('https://example.com/articles/fuji', 'Mount Fuji at dawn', image: 'https://example.com/fuji.jpg'),
+            ['pinterest', 'email'],
+        );
+
+        self::assertSame(['pinterest', 'email'], array_keys($share->links));
+        self::assertStringContainsString('media=https%3A%2F%2Fexample.com%2Ffuji.jpg', $share->url('pinterest'));
+        self::assertStringStartsWith('mailto:?subject=Mount%20Fuji%20at%20dawn', $share->url('email'));
+        self::assertFalse($share->link('email')->newTab());
+    }
+}
+```
+
+In a functional test of a page, assert the rendered `href`s (Symfony's `WebTestCase` crawler,
+Laravel's `assertSee()`): the addresses are deterministic for a given page.
+
 ## The package's own tests
 
 `docker compose run --rm omnipost test` runs every package's tests in the [harness](harness.md):
 the core's (the registry, capabilities and ratios, posts and variants, tokens, the validator rule
 by rule, the bundle, the plain-PHP run with no framework class loaded) and each provider's on
-answers written in the shapes the networks document.
+answers written in the shapes the networks document. The share links' are in `Tests/Share/`:
+`NetworksTest` (every network's address for one page, with and without text, picture, hashtags and
+account, the RFC 3986 encoding, Mastodon's instance), `ShareTest` (the order asked, the JSON, the
+defaults, a network added or replaced, an unknown network, an address that is not whole, the
+labels), `BareTest` (plain PHP with Composer's autoloader alone, nothing loaded but
+`Omnipost\Share`); `docker compose run --rm js` runs `Tests/js/share.test.cjs`, the script's, on
+node's test runner. PHPStan checks the share links at its highest level (`phpstan.neon`).

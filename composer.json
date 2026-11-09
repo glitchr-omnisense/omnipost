@@ -1,8 +1,8 @@
 {
     "name": "omnisense/omnipost",
     "type": "library",
-    "description": "Omnipost: one contract for publishing a post - a reel, a picture, a carousel - on the social networks, reading one's own feed, and the capabilities each network imposes - and its Symfony bundle.",
-    "keywords": ["social", "publishing", "instagram", "youtube", "reels", "omnipost"],
+    "description": "Omnipost: the social networks' family. Publish: one contract for publishing a post - a reel, a picture, a carousel - through a network's API, reading one's own feed, and the capabilities each network imposes. Share: plain share links for visitors (Facebook, X, Pinterest, LinkedIn, Bluesky, Mastodon, Threads, WhatsApp, Telegram, Reddit, e-mail, copy, share sheet) - no network script, no cookie, one JSON for Twig, Blade and React. And its Symfony bundle.",
+    "keywords": ["social", "publishing", "instagram", "youtube", "reels", "share", "share links", "share buttons", "facebook", "x", "pinterest", "linkedin", "bluesky", "mastodon", "threads", "whatsapp", "telegram", "reddit", "omnipost", "omnishare"],
     "license": "MIT",
     "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
     "require": {

@@ -10,7 +10,9 @@
 #   docker compose run --rm omnipost status instagram 17890...
 #   docker compose run --rm omnipost refresh instagram         # the new token, as JSON
 #   docker compose run --rm omnipost bare                      # plain PHP: no bundle, no container, and what PHP loaded
+#   docker compose run --rm omnipost bare-share                # plain PHP: every share link of a page, and what PHP loaded
 #   docker compose run --rm omnipost test                      # every package's tests
+#   docker compose run --rm js                                 # assets/omnipost-share.js on node's test runner
 #
 # Providers come from GitHub (branch 1.x) unless their checkout sits under
 # OMNIPOST_PLUGINS (set it to ../.. in .env when this core sits in the
@@ -28,6 +30,13 @@ services:
       - ..:/omnipost/core
       - ${OMNIPOST_PLUGINS:-./plugins}:/omnipost/plugins:ro
       - harness:/harness
+
+  js:
+    image: node:22-alpine
+    working_dir: /omnipost/core
+    command: ["node", "--test", "Tests/js/share.test.cjs"]
+    volumes:
+      - ..:/omnipost/core:ro
 
 volumes:
   harness:

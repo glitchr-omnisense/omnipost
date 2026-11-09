@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /**
  * X's (Twitter's) post intent: the address, the message, the hashtags and the

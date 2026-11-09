@@ -7,8 +7,9 @@ order: 90
 
 ## What the tests prove
 
-Run on 2026-10-26 on the three packages' checkouts (the workspace's autoloader), PHP 8.4.27,
-PHPUnit 11.5.57, no network: 62 tests, 355 assertions, green.
+Run on 2026-11-09 on the three packages' checkouts (the harness's `docker/harness/setup.php`,
+each provider from its checkout), PHP 8.4.27, PHPUnit 11.5.57, no network: 92 tests, 548
+assertions, green - the share links' 26 among them ([below](#share-links)).
 
 - The core (`Tests/`): the registry (each provider built once by name, publishers and feeds among
   them, a provider built afresh with a token from elsewhere, unknown names and factories, required
@@ -47,6 +48,37 @@ checkouts with a `MockHttpClient`.
   `insufficientPermissions` not an `UnauthorizedException` ([Errors](errors.md#by-provider));
   `Post::$link` and `Capabilities::$linkInCaption` read by no provider ([Concepts](concepts.md#posts));
   `ext-mbstring` not required by the core.
+
+## Share links
+
+- **Tests.** `Tests/Share/` (26 tests, on 2026-11-09 in the harness, PHP 8.4): every network's
+  address for one page, with and without text, picture, hashtags and account; the registry, the
+  JSON; in plain PHP, Composer's autoloader alone, nothing loaded but `Omnipost\Share`
+  (`BareTest`). PHPStan at its highest level on `Share/`, its exceptions and its tests, no error.
+  `assets/omnipost-share.js` on node's test runner (6 tests green, `docker compose run --rm js`).
+  The same tests, under `Omnishare\`, passed in `omnisense/omnishare` before the merge, where the
+  script was also run in a headless Chrome (the share sheet and the copy revealed, the address
+  copied, the sheet given the title and address, a Mastodon instance asked and opened); the script
+  has not been run in a browser since its attributes were renamed.
+- **Live, signed out**, on 2026-10-23 in a headless Chrome ([The networks](share-networks.md#what-each-network-was-seen-to-do)):
+  WhatsApp and Telegram show the title and the address on their share page; Facebook, X, Pinterest,
+  LinkedIn, Threads and Reddit keep the address (and, for those that take them, the title, picture,
+  hashtags and account) through their sign-in page; Mastodon's `/share` exists and asks to sign in
+  first; Bluesky's app recognises `/intent/compose` and, signed out, leaves it for its home page.
+- **In their source**, on 2026-10-24 ([The networks](share-networks.md#mastodon-and-bluesky-in-their-source-2026-10-24)):
+  Mastodon's `/share` is its composer behind the sign-in, filled with `title`, `text` and `url`
+  joined by spaces; Bluesky's `/intent/compose` opens the composer with `text` for a visitor signed
+  in, and drops it for one signed out.
+- **On an application**, before the merge: lesringostars built its articles' Facebook, X, Pinterest
+  and e-mail links with `omnisense/omnishare`, under Symfony, under its Laravel twin and in its
+  React screen. It has not moved to `Omnipost\Share` yet.
+- **Not verified**: what each network's composer shows once signed in (no account was used;
+  Mastodon's and Bluesky's read in their code, not seen); Mastodon's return to the share page after
+  its sign-in (Devise's default, read, not seen); the e-mail in a mail client other than the
+  browser's handler; Mastodon instances other than mastodon.social and piaille.fr.
+
+The share links are affiliated with none of the networks they link to; their names and colours are
+their owners'.
 
 ## Responsibility
 

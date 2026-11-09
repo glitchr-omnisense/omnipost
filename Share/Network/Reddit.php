@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** Reddit's submit page: a link post, its address and its title; the visitor picks the community. */
 final class Reddit extends AbstractNetwork

@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnishare\Tests;
+namespace Omnipost\Tests\Share;
 
-use Omnishare\Network;
-use Omnishare\NetworkInterface;
-use Omnishare\Registry;
-use Omnishare\Shareable;
+use Omnipost\Share\Network;
+use Omnipost\Share\NetworkInterface;
+use Omnipost\Share\Registry;
+use Omnipost\Share\Shareable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -55,7 +55,7 @@ final class NetworksTest extends TestCase
     {
         self::assertSame($plain, $network->shareUrl(self::page()));
         self::assertSame($everything, $network->shareUrl(self::page(true)), 'with hashtags and an account to credit');
-        self::assertSame('omnishare.'.$network->name(), $network->labelKey());
+        self::assertSame('omnipost.share.'.$network->name(), $network->labelKey());
         self::assertNotSame([], $network->uses());
         self::assertContains('url', $network->uses());
     }

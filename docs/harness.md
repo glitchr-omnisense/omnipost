@@ -26,7 +26,11 @@ docker compose run --rm omnipost providers
 | `refresh <provider>` | a fresh token, printed as a site would store it |
 | `authorize <provider> <redirect-uri>`, `exchange <provider> <code> <redirect-uri>` | connecting the account |
 | `bare` | plain PHP: the registry built by hand, two posts checked, YouTube asked, what PHP loaded |
+| `bare-share` | plain PHP: every share link of a page, as JSON, and every class PHP loaded for it |
 | `test` | every package's tests |
+
+`docker compose run --rm js` runs the share script's tests (`Tests/js/share.test.cjs`) on node's
+test runner, in a `node:22-alpine` container.
 
 `validate` and `publish` take `--title`, `--kind`, `--tag`, `--file`, `--cover`, `--duration`,
 `--width`, `--height` and `-o option=value`; they measure what they can (the type and size the
@@ -83,6 +87,11 @@ API v3 documents, as in omnipost/youtube's tests - the channel and its videos ar
 autoloader - without a call: `Tests/BareTest.php` runs it in a process of its own and checks the
 list.
 
+`bare-share` (`docker/harness/bin/bare-share`) does the same for the share links: the autoloader
+alone, a page shared to every network, the links printed as JSON with what PHP loaded for them past
+what the autoloader loads by itself - nothing but `Omnipost\Share`'s classes, not even the HTTP
+client's contracts (`Tests/Share/BareTest.php`).
+
 The image is `php:8.4-cli-alpine` with Composer; the harness's packages live in the `harness`
 volume of the `omnipost-harness` project.
 
@@ -93,7 +102,7 @@ volume of the `omnipost-harness` project.
 provider from its checkout under `OMNIPOST_PLUGINS` when one is there, from
 `https://github.com/glitchr-omnisense/omnipost-<slug>.git` (branch 1.x) otherwise. Then
 `composer install` the first time, `composer update` when `composer.json` is newer than the lock,
-and the command: `test` (PHPUnit), `bare`, `composer`, `sh` or `php` as they are, anything else the
+and the command: `test` (PHPUnit), `bare`, `bare-share`, `composer`, `sh` or `php` as they are, anything else the
 console (`docker/harness/bin/omnipost`, `providers` by default).
 
 The image (`omnisense/omnipost-harness`) is built from `docker/Dockerfile` the first time

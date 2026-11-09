@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** LinkedIn's share-offsite: the address alone (it no longer takes a title nor a summary); LinkedIn reads the page's og:* tags. */
 final class LinkedIn extends AbstractNetwork

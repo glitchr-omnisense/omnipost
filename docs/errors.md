@@ -95,3 +95,17 @@ try {
     // the network refused, or could not be reached: $e->status, $e->providerCode; retry later
 }
 ```
+
+## Share links
+
+The share links throw two, both `OmnipostException`s too, both programming errors to fix rather
+than conditions to handle:
+
+| Exception | Parent | When | Message |
+|---|---|---|---|
+| `InvalidShareableException` | `\InvalidArgumentException` | a `Share\Shareable`'s `url`, or its non-empty `image`, is not a whole http(s) address | `The url to share must be a whole http(s) address, "/articles/fuji" given.` |
+| `UnknownNetworkException` | `\OutOfBoundsException` | `Share\Registry::get()` or `share()` asked for a name the registry does not hold | `No share network "myspace"; known: facebook, x, pinterest, ...` |
+
+No share network calls anything, so nothing fails at run time once the links are built. A relative
+address is the usual cause of the first: build the Shareable from the page's absolute URL
+(Symfony's `url()`, Laravel's `url()` or `route()`, not `path()`).

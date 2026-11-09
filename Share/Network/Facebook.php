@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** Facebook's sharer: the address alone; Facebook reads the title and the picture from the page's og:* tags. */
 final class Facebook extends AbstractNetwork

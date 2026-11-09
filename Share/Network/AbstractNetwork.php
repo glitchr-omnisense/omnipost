@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\NetworkInterface;
-use Omnishare\Shareable;
+use Omnipost\Share\NetworkInterface;
+use Omnipost\Share\Shareable;
 
 /**
  * What most networks share: the label key and the icon named after the
@@ -13,7 +13,7 @@ abstract class AbstractNetwork implements NetworkInterface
 {
     public function labelKey(): string
     {
-        return 'omnishare.'.$this->name();
+        return 'omnipost.share.'.$this->name();
     }
 
     public function icon(): string

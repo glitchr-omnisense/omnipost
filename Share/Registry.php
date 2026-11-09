@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare;
+namespace Omnipost\Share;
 
-use Omnishare\Exception\UnknownNetworkException;
+use Omnipost\Exception\UnknownNetworkException;
 
 /**
  * The networks by name, and the links of a Shareable to those an application
@@ -27,7 +27,7 @@ final class Registry
     }
 
     /**
-     * Every network omnishare knows, in this order: facebook, x, pinterest,
+     * Every share network the core knows, in this order: facebook, x, pinterest,
      * linkedin, bluesky, mastodon, threads, whatsapp, telegram, reddit, email,
      * copy, native.
      *

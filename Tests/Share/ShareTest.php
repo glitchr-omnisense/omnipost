@@ -1,19 +1,19 @@
 <?php
 
-namespace Omnishare\Tests;
+namespace Omnipost\Tests\Share;
 
-use Omnishare\Exception\InvalidShareableException;
-use Omnishare\Exception\OmnishareException;
-use Omnishare\Exception\UnknownNetworkException;
-use Omnishare\Labels;
-use Omnishare\Link;
-use Omnishare\Network\CopyLink;
-use Omnishare\Network\Facebook;
-use Omnishare\Network\Mastodon;
-use Omnishare\Network\X;
-use Omnishare\NetworkInterface;
-use Omnishare\Registry;
-use Omnishare\Shareable;
+use Omnipost\Exception\InvalidShareableException;
+use Omnipost\Exception\OmnipostException;
+use Omnipost\Exception\UnknownNetworkException;
+use Omnipost\Share\Labels;
+use Omnipost\Share\Link;
+use Omnipost\Share\Network\CopyLink;
+use Omnipost\Share\Network\Facebook;
+use Omnipost\Share\Network\Mastodon;
+use Omnipost\Share\Network\X;
+use Omnipost\Share\NetworkInterface;
+use Omnipost\Share\Registry;
+use Omnipost\Share\Shareable;
 use PHPUnit\Framework\TestCase;
 
 /** A Registry's links of a page, the JSON templates read, a Shareable's checks, the labels. */
@@ -33,7 +33,7 @@ final class ShareTest extends TestCase
         self::assertSame([
             'network' => 'facebook',
             'url' => 'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fexample.com%2Fa',
-            'label' => 'omnishare.facebook',
+            'label' => 'omnipost.share.facebook',
             'icon' => 'facebook',
             'color' => '#1877f2',
             'newTab' => true,
@@ -96,7 +96,7 @@ final class ShareTest extends TestCase
                 new Shareable($address, 'a');
                 self::fail($address.' was taken');
             } catch (InvalidShareableException $e) {
-                self::assertInstanceOf(OmnishareException::class, $e);
+                self::assertInstanceOf(OmnipostException::class, $e);
             }
         }
         $this->expectException(InvalidShareableException::class);
@@ -105,9 +105,9 @@ final class ShareTest extends TestCase
 
     public function testTheLabels(): void
     {
-        self::assertSame('Épingler sur Pinterest', Labels::get('omnishare.pinterest', 'fr_FR'));
-        self::assertSame('Pin on Pinterest', Labels::get('omnishare.pinterest', 'de'));
-        self::assertSame('omnishare.myspace', Labels::get('omnishare.myspace'));
+        self::assertSame('Épingler sur Pinterest', Labels::get('omnipost.share.pinterest', 'fr_FR'));
+        self::assertSame('Pin on Pinterest', Labels::get('omnipost.share.pinterest', 'de'));
+        self::assertSame('omnipost.share.myspace', Labels::get('omnipost.share.myspace'));
         $registry = Registry::defaults();
         foreach (Labels::locales() as $locale) {
             foreach ($registry->names() as $name) {

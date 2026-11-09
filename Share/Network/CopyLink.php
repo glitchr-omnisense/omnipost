@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /**
- * The page's address copied to the clipboard (omnishare's script, action
+ * The page's address copied to the clipboard (the share script, action
  * "copy"; hidden where the browser has no clipboard). Its link is the address
  * itself, so a visitor without the script can still copy it from the link.
  */

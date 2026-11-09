@@ -1,13 +1,13 @@
 <?php
 
-namespace Omnishare;
+namespace Omnipost\Share;
 
 /**
  * A Shareable and its links, in the order they were asked for: what a
  * template draws. toArray() is the one JSON Twig, Blade and React read alike:
  *
  *     {"url": ..., "title": ..., "text": ..., "image": ..., "hashtags": [...], "via": ...,
- *      "links": {"facebook": {"network": "facebook", "url": ..., "label": "omnishare.facebook",
+ *      "links": {"facebook": {"network": "facebook", "url": ..., "label": "omnipost.share.facebook",
  *                             "icon": "facebook", "color": "#1877f2", "newTab": true, "action": null}, ...}}
  */
 final readonly class Share implements \JsonSerializable

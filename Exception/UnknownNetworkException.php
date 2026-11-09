@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Exception;
+namespace Omnipost\Exception;
 
-/** A network asked of a Registry by a name it does not hold. */
-final class UnknownNetworkException extends \OutOfBoundsException implements OmnishareException
+/** A share network asked of a Share\Registry by a name it does not hold. */
+final class UnknownNetworkException extends \OutOfBoundsException implements OmnipostException
 {
 }

@@ -1,9 +1,9 @@
 ---
-title: Templates
-order: 35
+title: Share links in templates
+order: 38
 ---
 
-# Templates: Twig, Blade, React - one JSON
+# Share links in templates: Twig, Blade, React - one JSON
 
 `Share::toArray()` is the same array whatever draws it:
 
@@ -12,11 +12,11 @@ order: 35
   "url": "https://example.com/articles/fuji", "title": "Mount Fuji at dawn", "text": null,
   "image": "https://example.com/images/fuji.jpg", "hashtags": ["japan"], "via": null,
   "links": {
-    "facebook": {"network": "facebook", "url": "https://www.facebook.com/sharer/sharer.php?u=…", "label": "omnishare.facebook",
+    "facebook": {"network": "facebook", "url": "https://www.facebook.com/sharer/sharer.php?u=…", "label": "omnipost.share.facebook",
                  "icon": "facebook", "color": "#1877f2", "newTab": true, "action": null},
-    "email":    {"network": "email", "url": "mailto:?subject=…&body=…", "label": "omnishare.email",
+    "email":    {"network": "email", "url": "mailto:?subject=…&body=…", "label": "omnipost.share.email",
                  "icon": "envelope", "color": null, "newTab": false, "action": null},
-    "native":   {"network": "native", "url": "https://example.com/articles/fuji", "label": "omnishare.native",
+    "native":   {"network": "native", "url": "https://example.com/articles/fuji", "label": "omnipost.share.native",
                  "icon": "share", "color": null, "newTab": false, "action": "share"}
   }
 }
@@ -24,16 +24,16 @@ order: 35
 
 `icon` is a name for the application's own icon set (Font Awesome: `fa-brands fa-<icon>`, with
 `fa-solid` for `envelope`, `link` and `share` - `share-nodes` in Font Awesome 6). `label` is a key
-of omnishare's catalogues; an application may use its own words instead.
+of the share labels' catalogues (`Share/translations/`); an application may use its own words instead.
 
 ## Twig
 
 ```twig
-<ul class="share" aria-label="{{ 'omnishare.title'|trans }}">
+<ul class="share" aria-label="{{ 'omnipost.share.title'|trans }}">
   {% for link in share.links %}
-    <li{% if link.action in ['share', 'copy'] %} data-omnishare-item hidden{% endif %}>
+    <li{% if link.action in ['share', 'copy'] %} data-omnipost-share-item hidden{% endif %}>
       <a href="{{ link.url }}"{% if link.newTab %} target="_blank" rel="noopener"{% endif %}
-         {% if link.action %}data-omnishare="{{ link.action }}" data-omnishare-title="{{ share.title }}"{% endif %}
+         {% if link.action %}data-omnipost-share="{{ link.action }}" data-omnipost-share-title="{{ share.title }}"{% endif %}
          aria-label="{{ link.label|trans }}" style="--share-color: {{ link.color ?? 'currentColor' }}">
         <i class="fa-{{ link.icon in ['envelope', 'link', 'share'] ? 'solid' : 'brands' }} fa-{{ link.icon }}" aria-hidden="true"></i>
       </a>
@@ -50,11 +50,11 @@ controller's variable).
 The same loop in Blade, `$share` the array:
 
 ```blade
-<ul class="share" aria-label="{{ __('omnishare.title') }}">
+<ul class="share" aria-label="{{ __('omnipost.share.title') }}">
   @foreach ($share['links'] as $link)
-    <li @if (in_array($link['action'], ['share', 'copy'])) data-omnishare-item hidden @endif>
+    <li @if (in_array($link['action'], ['share', 'copy'])) data-omnipost-share-item hidden @endif>
       <a href="{{ $link['url'] }}" @if ($link['newTab']) target="_blank" rel="noopener" @endif
-         @if ($link['action']) data-omnishare="{{ $link['action'] }}" data-omnishare-title="{{ $share['title'] }}" @endif
+         @if ($link['action']) data-omnipost-share="{{ $link['action'] }}" data-omnipost-share-title="{{ $share['title'] }}" @endif
          aria-label="{{ __($link['label']) }}">…</a>
     </li>
   @endforeach

@@ -1,9 +1,9 @@
 ---
-title: The networks
-order: 30
+title: Share links, the networks
+order: 37
 ---
 
-# The networks
+# Share links: the networks
 
 ## The addresses built
 
@@ -37,7 +37,7 @@ action.
 
 ## What each network was seen to do
 
-Each address below is what omnishare builds for one page
+Each address below is what the core builds for one page
 (`https://example.com/articles/fuji?lang=fr`, "Le Fuji (l'ascension) & nous !", a picture, the
 hashtags `japon` and `fuji`, the account `lesringostars`). Each was opened on 2026-10-23 in a
 headless Chrome, **signed out**, to see what the network's page receives.
@@ -55,8 +55,8 @@ headless Chrome, **signed out**, to see what the network's page receives.
 | Telegram | `https://t.me/share/url?url=…&text=…` | "Telegram: Share Web Page" shows the address and the title. **Verified** |
 | Reddit | `https://www.reddit.com/submit?url=…&title=…` | a "prove your humanity" challenge for a headless browser; the address and the title kept. **Verified** to that point |
 | E-mail | `mailto:?subject=…&body=…` | no network: the subject and body decode to the title and the address (a space is `%20`) |
-| Copy | the address | `assets/omnishare.js` in a headless Chrome: the address on the clipboard |
-| Share sheet | the address | `assets/omnishare.js` in a headless Chrome: `navigator.share` given the title and the address |
+| Copy | the address | `assets/omnipost-share.js` in a headless Chrome: the address on the clipboard |
+| Share sheet | the address | `assets/omnipost-share.js` in a headless Chrome: `navigator.share` given the title and the address |
 
 ## Mastodon and Bluesky, in their source (2026-10-24)
 
@@ -69,9 +69,9 @@ own code instead:
   composer (`entrypoints/share.tsx`). `ApplicationHelper#render_initial_state` gives it
   `text: [params[:title], params[:text], params[:url]].compact.join(' ')`
   (`InitialStateSerializer`: `store[:text]`), and the compose reducer, hydrated, sets the
-  composer's text and focuses it. So omnishare's one `text` (message, hashtags, address) is the
+  composer's text and focuses it. So the one `text` built here (message, hashtags, address) is the
   post as it is written; `visibility` (public, unlisted, private, direct) is read too, and not
-  given by omnishare. Signed out, Devise's sign-in returns to the address asked by its default
+  given here. Signed out, Devise's sign-in returns to the address asked by its default
   (`store_location` for a GET page): read, not seen.
 - **Bluesky** (bluesky-social/social-app, branch main at 4e4ad9c5f):
   `src/lib/hooks/useIntentHandler.ts` reads `/intent/compose` and its `text` (also `imageUris`
@@ -82,6 +82,6 @@ own code instead:
   address in the text.
 
 Addresses that were not chosen: X's newer `x.com/intent/post` (twitter.com's intent answers 301 to
-x.com and keeps every parameter; lesringostars' links used twitter.com before omnishare and are
+x.com and keeps every parameter; lesringostars' links used twitter.com before these share links and are
 unchanged); Facebook's `quote` (ignored by Facebook since 2023); LinkedIn's `shareArticle?mini=true`
 with `title` and `summary` (LinkedIn sends share-offsite there itself and drops them).

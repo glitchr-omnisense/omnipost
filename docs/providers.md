@@ -31,6 +31,10 @@ package of its own, as `omnipost/instagram` and `omnipost/youtube` are.
   messages.
 - **Read the variant's post.** A provider is given `$post->for($platform)`; it reads the post's
   fields and `options`, never `variants`.
+- **No share link.** A network's share page is in the core's share table
+  (`Share\Registry::defaults()`, [Share links](share.md)), not in its provider: a provider is for
+  what needs the network's API. A network with a share page the core lacks gets a
+  `Share\NetworkInterface` added to the core, or to the application (`Share\Registry::add()`).
 
 ## A provider of the application's
 

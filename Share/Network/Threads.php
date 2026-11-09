@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** Threads' post intent: the message (with the hashtags) and the address apart, which Threads shows as the link's card. */
 final class Threads extends AbstractNetwork

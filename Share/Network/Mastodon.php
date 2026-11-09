@@ -1,13 +1,13 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /**
  * Mastodon's share page, on one instance: one text, the message, the hashtags
  * and the address. Mastodon has no central site: the instance is configured,
- * or - when none is - the visitor gives theirs (omnishare's script asks it on
+ * or - when none is - the visitor gives theirs (the share script asks it on
  * a click, action "instance"; without the script the link goes to
  * mastodon.social).
  */

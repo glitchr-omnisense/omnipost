@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** Pinterest's pin: the address, the picture pinned and its description; without a picture Pinterest offers the page's own. */
 final class Pinterest extends AbstractNetwork

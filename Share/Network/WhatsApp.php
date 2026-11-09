@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** WhatsApp's click-to-chat: one text, the message and the address; the visitor picks the chat. */
 final class WhatsApp extends AbstractNetwork

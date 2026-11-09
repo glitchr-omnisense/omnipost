@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare;
+namespace Omnipost\Share;
 
-use Omnishare\Exception\InvalidShareableException;
+use Omnipost\Exception\InvalidShareableException;
 
 /**
  * What is shared: a page, by its canonical address, with what the networks

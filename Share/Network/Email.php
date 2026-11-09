@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** An e-mail from the visitor's own mail client: the title as its subject, the text (when there is one) and the address as its body. */
 final class Email extends AbstractNetwork

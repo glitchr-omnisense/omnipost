@@ -1,7 +1,12 @@
 # omnisense/omnipost
 
-One contract for publishing a post on the social networks and reading one's own feed - the
-Omnibus of publication, beside glitchr/omnitrade (payments) and glitchr/omnibus (shipping).
+The social networks' family, with two contracts: **publish** - a post (a reel, a picture, a
+carousel) published through a network's API, and one's own feed read back - and **share** - plain
+share links for a page's visitors, with no network script and no cookie. The Omnibus of
+publication, beside glitchr/omnitrade (payments) and glitchr/omnibus (shipping).
+
+`omnisense/omnishare` was merged into this package on 2026-11-09, with its history: its share
+links are `Omnipost\Share\` ([Share links](#share-links)).
 
 Published as `omnisense/omnipost` (formerly `glitchr/omnipost`, which this package replaces: a
 `composer.json` that still requires the old name keeps resolving to this package, never both).
@@ -44,11 +49,13 @@ application, with its own interface and database). Omnipost is neither: a librar
 site, no third party holding the artist's tokens, no second application to run, nothing to pay
 but the networks' own terms.
 
-This package holds the contract (`PublisherInterface`, `FeedInterface`, `ProviderFactory`,
-`Registry`, `Validator`), the models (`Post`, `Media`, `Variant`, `Publication`, `Feed`,
-`FeedItem`, `Account`, `Token`, `Capabilities`, `Violation`) and a bridge for Symfony. It needs no
-framework: it requires nothing but `symfony/http-client-contracts`, each provider package
-`symfony/http-client`. Each network is a package of its own:
+This package holds the publishing contract (`PublisherInterface`, `FeedInterface`,
+`ProviderFactory`, `Registry`, `Validator`), the models (`Post`, `Media`, `Variant`, `Publication`,
+`Feed`, `FeedItem`, `Account`, `Token`, `Capabilities`, `Violation`), the share links
+(`Share\NetworkInterface`, `Share\Registry`, `Share\Shareable`, `Share\Share`, `Share\Link` and
+the networks) and a bridge for Symfony. It needs no framework: it requires nothing but
+`symfony/http-client-contracts`, each provider package `symfony/http-client`. Each network that is
+published to is a package of its own:
 
 | Package | Network |
 |---|---|
@@ -57,6 +64,22 @@ framework: it requires nothing but `symfony/http-client-contracts`, each provide
 
 `DistributorInterface` is reserved - delivering a release to the streaming platforms through a
 distributor - and has no implementation yet.
+
+## The contracts, and who implements them
+
+| Package | Contracts |
+|---|---|
+| `omnisense/omnipost` (this core) | publish: `PublisherInterface`, `FeedInterface`, `Auth\RefreshableInterface`, `Auth\OAuthInterface` (declared); share: `Share\NetworkInterface` and every network that has a share page, implemented here (`Share\Registry::defaults()`) |
+| `omnipost/instagram` | publish, feed, token refresh, OAuth. No share: Instagram has no share page on the web |
+| `omnipost/youtube` | publish, feed, token refresh, OAuth. No share: YouTube has no share page on the web |
+
+A share network is an address template - no dependency, no option, no credential, no API - so the
+thirteen are in the core's share table rather than in thirteen provider packages of thirty lines
+each; a provider package is for what needs a network's API. Facebook, X, Threads, LinkedIn,
+Bluesky, Mastodon and Pinterest have a share link here and a publishing API no provider calls yet;
+WhatsApp, Telegram, Reddit, the e-mail, the copied link and the device's share sheet are share
+only; Instagram, YouTube and TikTok are publish only. The table per network:
+[docs/index.md](docs/index.md#the-contracts-per-network).
 
 ## Install
 
@@ -93,6 +116,35 @@ and makes its own when given none. A whole script that runs as it is, and the re
 [docs/installation.md](docs/installation.md). No class of a framework is loaded on the way:
 `Tests/BareTest.php` checks it in a process of its own, and so does
 `docker compose run --rm omnipost bare`.
+
+## Share links
+
+```php
+use Omnipost\Share\Registry;
+use Omnipost\Share\Shareable;
+
+$share = Registry::defaults()->share(
+    new Shareable('https://example.com/articles/fuji', 'Mount Fuji at dawn', image: 'https://example.com/fuji.jpg', hashtags: ['japan']),
+    ['facebook', 'x', 'pinterest', 'email', 'native'],   // the ones the page shows, in its order
+);
+$share->url('x');     // https://twitter.com/intent/tweet?url=https%3A%2F%2Fexample.com%2Farticles%2Ffuji&text=Mount%20Fuji%20at%20dawn&hashtags=japan
+$share->toArray();    // the one JSON Twig, Blade and React read: the page, then each link's url, label, icon, colour, newTab, action
+```
+
+A page's address, title, text, picture and hashtags turned into each network's own share page
+(Facebook, X, Pinterest, LinkedIn, Bluesky, Mastodon, Threads, WhatsApp, Telegram, Reddit), an
+e-mail, a copied link and the device's share sheet. **Plain links**: no network's script is
+loaded, so no cookie is set and nothing needs the visitor's consent; no account, no credential, no
+API call. `Omnipost\Share` needs PHP alone - no HTTP client, no framework: `Tests/Share/BareTest`
+checks it loads no class outside itself. `assets/omnipost-share.js` (no dependency) adds the share
+sheet, the copy and the visitor's Mastodon instance where the browser can; labels in English and
+French are in `Share/translations/`.
+
+From `omnisense/omnishare`: `Omnishare\` is `Omnipost\Share\` (its exceptions
+`Omnipost\Exception\`), the label keys `omnishare.*` are `omnipost.share.*`, and the script is
+`assets/omnipost-share.js` (`data-omnipost-share`, `OmnipostShare`, `omnipost-share:copied`).
+`omnisense/omnishare` is not replaced by this package: its namespace changed, so an application
+changes its `use` lines and requires `omnisense/omnipost`. The manual: [docs/share.md](docs/share.md).
 
 ## Symfony
 
@@ -156,7 +208,9 @@ docker compose run --rm omnipost refresh instagram                   # the new t
 docker compose run --rm omnipost authorize youtube http://localhost/callback
 docker compose run --rm omnipost exchange youtube 4/0A... http://localhost/callback   # prints the refresh token
 docker compose run --rm omnipost bare                                # plain PHP: no bundle, no container, and what PHP loaded
+docker compose run --rm omnipost bare-share                          # plain PHP: every share link of a page, and what PHP loaded
 docker compose run --rm omnipost test                                # every package's tests
+docker compose run --rm js                                           # the share script's tests (node)
 ```
 
 `validate` and `publish` measure what they can (the type and size the server announces, a local
@@ -168,6 +222,7 @@ docker compose run --rm omnipost test                                # every pac
 - [Installation and first calls](docs/installation.md): plain PHP first
 - [Symfony](docs/symfony.md), [Laravel](docs/laravel.md)
 - [Concepts](docs/concepts.md): providers and their interfaces, the registry, posts, media, publications, tokens
+- [Share links](docs/share.md): [concepts](docs/share-concepts.md), [the networks and how each address was checked](docs/share-networks.md), [templates](docs/share-templates.md), [the script](docs/share-javascript.md)
 - [Publishing](docs/usage-publishing.md), [Validating a post](docs/usage-validation.md), [Reading an account](docs/usage-reading.md), [Tokens and connecting an account](docs/usage-tokens.md)
 - [Configuration reference](docs/configuration.md), [Errors](docs/errors.md), [Testing](docs/testing.md)
 - [The Docker harness](docs/harness.md), [Writing a provider](docs/providers.md)

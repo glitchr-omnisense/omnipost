@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /** Telegram's share page: the address and the message apart; the visitor picks the chat. */
 final class Telegram extends AbstractNetwork

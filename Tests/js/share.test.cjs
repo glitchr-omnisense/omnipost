@@ -1,8 +1,8 @@
-// omnishare.js on node's own test runner, with small stand-ins for the DOM:
-//   node --test Tests/js/omnishare.test.cjs
+// omnipost-share.js on node's own test runner, with small stand-ins for the DOM:
+//   node --test Tests/js/share.test.cjs
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Omnishare = require('../../assets/omnishare.js');
+const OmnipostShare = require('../../assets/omnipost-share.js');
 
 function element(attributes = {}, parent = null) {
     const attrs = { ...attributes };
@@ -27,64 +27,64 @@ const rootOf = (links) => ({ querySelectorAll: () => links });
 const click = (target) => { const event = { target, prevented: false, preventDefault() { event.prevented = true; } }; return event; };
 
 test('the share sheet and the copy are shown only where the browser has them', () => {
-    const item = element({ 'data-omnishare-item': '', hidden: '' });
-    const share = element({ 'data-omnishare': 'share' }, item);
-    const copy = element({ 'data-omnishare': 'copy', hidden: '' });
-    Omnishare.reveal(rootOf([share, copy]), {});
+    const item = element({ 'data-omnipost-share-item': '', hidden: '' });
+    const share = element({ 'data-omnipost-share': 'share' }, item);
+    const copy = element({ 'data-omnipost-share': 'copy', hidden: '' });
+    OmnipostShare.reveal(rootOf([share, copy]), {});
     assert.equal(item.hidden, true, 'no navigator.share: its item stays hidden');
     assert.equal(copy.hidden, true, 'no clipboard: hidden');
 
-    Omnishare.reveal(rootOf([share, copy]), { share() {}, clipboard: { writeText() {} } });
+    OmnipostShare.reveal(rootOf([share, copy]), { share() {}, clipboard: { writeText() {} } });
     assert.equal(item.hidden, false);
     assert.equal(copy.hidden, false);
 });
 
 test('a click on the share action gives the sheet its title, text and address', async () => {
     let shared = null;
-    const link = element({ 'data-omnishare': 'share', href: 'https://example.com/a', 'data-omnishare-title': 'Le Fuji', 'data-omnishare-text': '' });
+    const link = element({ 'data-omnipost-share': 'share', href: 'https://example.com/a', 'data-omnipost-share-title': 'Le Fuji', 'data-omnipost-share-text': '' });
     const event = click(link);
-    await Omnishare.handle(event, { share: (data) => { shared = data; return Promise.reject(new Error('AbortError')); } }, {});
+    await OmnipostShare.handle(event, { share: (data) => { shared = data; return Promise.reject(new Error('AbortError')); } }, {});
     assert.equal(event.prevented, true);
     assert.deepEqual(shared, { url: 'https://example.com/a', title: 'Le Fuji' }, 'an empty text is left out; a closed sheet says nothing');
 });
 
 test('a click on copy writes the address, marks the link and tells the page', async () => {
     let written = null; let timer = null;
-    const link = element({ 'data-omnishare': 'copy', href: 'https://example.com/a' });
+    const link = element({ 'data-omnipost-share': 'copy', href: 'https://example.com/a' });
     const icon = element({}, link);
     global.CustomEvent = class { constructor(type) { this.type = type; } };
-    await Omnishare.handle(click(icon), { clipboard: { writeText: async (text) => { written = text; } } }, { setTimeout: (f) => { timer = f; } });
+    await OmnipostShare.handle(click(icon), { clipboard: { writeText: async (text) => { written = text; } } }, { setTimeout: (f) => { timer = f; } });
     assert.equal(written, 'https://example.com/a');
-    assert.equal(link.hasAttribute('data-omnishare-copied'), true);
-    assert.deepEqual(link.events, ['omnishare:copied']);
+    assert.equal(link.hasAttribute('data-omnipost-share-copied'), true);
+    assert.deepEqual(link.events, ['omnipost-share:copied']);
     timer();
-    assert.equal(link.hasAttribute('data-omnishare-copied'), false, 'two seconds later the mark is gone');
+    assert.equal(link.hasAttribute('data-omnipost-share-copied'), false, 'two seconds later the mark is gone');
 });
 
 test('Mastodon asks the visitor\'s instance and opens the same share page there', () => {
     const href = 'https://mastodon.social/share?text=Le%20Fuji%20https%3A%2F%2Fexample.com%2Fa';
-    const link = element({ 'data-omnishare': 'instance', href, 'data-omnishare-prompt': 'Votre instance' });
+    const link = element({ 'data-omnipost-share': 'instance', href, 'data-omnipost-share-prompt': 'Votre instance' });
     let asked = null; let opened = null;
-    const host = Omnishare.handle(click(link), {}, { prompt: (q, d) => { asked = [q, d]; return '@marco@Piaille.fr'; }, open: (...a) => { opened = a; } });
+    const host = OmnipostShare.handle(click(link), {}, { prompt: (q, d) => { asked = [q, d]; return '@marco@Piaille.fr'; }, open: (...a) => { opened = a; } });
     assert.deepEqual(asked, ['Votre instance', 'mastodon.social']);
     assert.equal(host, 'piaille.fr');
     assert.deepEqual(opened, ['https://piaille.fr/share?text=Le%20Fuji%20https%3A%2F%2Fexample.com%2Fa', '_blank', 'noopener']);
 
-    const cancelled = element({ 'data-omnishare': 'instance', href });
-    assert.equal(Omnishare.handle(click(cancelled), {}, { prompt: () => null, open: () => assert.fail('nothing opened') }), null);
+    const cancelled = element({ 'data-omnipost-share': 'instance', href });
+    assert.equal(OmnipostShare.handle(click(cancelled), {}, { prompt: () => null, open: () => assert.fail('nothing opened') }), null);
 });
 
 test('an instance is read from what a visitor types', () => {
-    assert.equal(Omnishare.instance(' https://Piaille.fr/about '), 'piaille.fr');
-    assert.equal(Omnishare.instance('@me@mastodon.social'), 'mastodon.social');
-    assert.equal(Omnishare.instance('localhost'), null);
-    assert.equal(Omnishare.instance('not a host'), null);
+    assert.equal(OmnipostShare.instance(' https://Piaille.fr/about '), 'piaille.fr');
+    assert.equal(OmnipostShare.instance('@me@mastodon.social'), 'mastodon.social');
+    assert.equal(OmnipostShare.instance('localhost'), null);
+    assert.equal(OmnipostShare.instance('not a host'), null);
 });
 
 test('a plain link is left to the browser', () => {
-    const link = element({ 'data-omnishare': '', href: 'https://www.facebook.com/sharer/sharer.php?u=x' });
+    const link = element({ 'data-omnipost-share': '', href: 'https://www.facebook.com/sharer/sharer.php?u=x' });
     const event = click(element({}, null));
-    assert.equal(Omnishare.handle(event, {}, {}), false);
+    assert.equal(OmnipostShare.handle(event, {}, {}), false);
     assert.equal(event.prevented, false);
-    assert.equal(Omnishare.handle(click(link), {}, {}), false);
+    assert.equal(OmnipostShare.handle(click(link), {}, {}), false);
 });

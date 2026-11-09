@@ -1,12 +1,12 @@
 <?php
 
-namespace Omnishare\Network;
+namespace Omnipost\Share\Network;
 
-use Omnishare\Shareable;
+use Omnipost\Share\Shareable;
 
 /**
  * The device's own share sheet (navigator.share: the title, the text and the
- * address; omnishare's script, action "share"), hidden where the browser has
+ * address; the share script, action "share"), hidden where the browser has
  * none. Its link is the page's address.
  */
 final class Native extends AbstractNetwork
