@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * omnishare in plain PHP: Composer's autoloader and nothing else - no
+ * framework, no container, no template engine. Builds the registry, shares a
+ * page to every network, and prints, as JSON, the links and what PHP loaded
+ * for it, past what the autoloader loads by itself (Tests/BareTest reads it).
+ *
+ *   php docker/harness/bin/bare     (OMNISHARE_AUTOLOAD: the autoload.php to use)
+ */
+
+$autoload = getenv('OMNISHARE_AUTOLOAD') ?: dirname(__DIR__, 3).'/vendor/autoload.php';
+require $autoload;
+
+// What the autoloader itself loaded (an application's "files" autoloads may load classes of
+// their own): the report names only what omnishare's work loads besides.
+$declared = static fn (): array => array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
+$before = $declared();
+
+use Omnishare\Labels;
+use Omnishare\Registry;
+use Omnishare\Shareable;
+
+$share = Registry::defaults()->share(new Shareable(
+    'https://example.com/articles/fuji',
+    "Le Fuji (l'ascension) & nous !",
+    image: 'https://example.com/images/fuji.jpg',
+    hashtags: ['japon'],
+));
+$label = Labels::get($share->links['pinterest']->labelKey, 'fr');
+
+$loaded = array_values(array_filter(
+    array_diff($declared(), $before),
+    static fn (string $class) => !(new ReflectionClass($class))->isInternal(),
+));
+sort($loaded);
+
+echo json_encode([
+    'share' => $share->toArray(),
+    'label' => $label,
+    'loaded' => $loaded,
+], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), "\n";
