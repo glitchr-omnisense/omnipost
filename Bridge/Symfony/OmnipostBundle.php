@@ -38,7 +38,8 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
  * inside try/catch InvalidConfigException says whether it is configured.
  *
  * An application's own factories (a ProviderFactoryInterface) are registered
- * too, autoconfigured.
+ * too, autoconfigured. A provider's "policy" and "usage" sit beside its
+ * options; "limiter" names a shared RateLimiterInterface service.
  */
 final class OmnipostBundle extends AbstractBundle
 {
@@ -58,13 +59,19 @@ final class OmnipostBundle extends AbstractBundle
                         ->children()
                             ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
                             ->variableNode('options')->defaultValue([])->end()
+                            ->variableNode('policy')->info('The site\'s tightening of the provider\'s usage policy (omnisense/contracts\' schema): never looser.')->end()
+                            ->variableNode('usage')->info('What the site is: commercial, open_source, contract.')->end()
                         ->end()
                     ->end()
+                ->end()
+                ->scalarNode('limiter')
+                    ->info('A service implementing Omnisense\\Contracts\\Policy\\RateLimiterInterface, shared by every process (omnibridge/symfony\'s); an in-memory one when null.')
+                    ->defaultNull()
                 ->end()
             ->end();
     }
 
-    /** @param array{providers: array<string, array{factory: string, options: array<string, mixed>}>} $config */
+    /** @param array{providers: array<string, array{factory: string, options: array<string, mixed>, policy?: array<string, mixed>, usage?: array<string, mixed>}>, limiter: ?string} $config */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $builder->registerForAutoconfiguration(ProviderFactoryInterface::class)->addTag('omnipost.provider_factory');
@@ -77,7 +84,7 @@ final class OmnipostBundle extends AbstractBundle
         }
 
         $services->set(Registry::class)
-            ->args([tagged_iterator('omnipost.provider_factory'), $config['providers']])
+            ->args([tagged_iterator('omnipost.provider_factory'), $config['providers'], null !== $config['limiter'] ? service($config['limiter']) : null])
             ->public();
         $services->set(Validator::class);
 

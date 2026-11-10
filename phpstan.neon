@@ -1,13 +1,14 @@
-# PHPStan at the highest level on the share links (omnishare's, which had it before the merge):
-# Share/, its two exceptions and its tests. The rest of the core is not analysed yet.
-# phpstan-baseline.neon is empty: nothing is accepted, glitchr-studio/ci's job fails on any error.
+# PHPStan at the highest level on the whole core (until omnisense/contracts came in, the share
+# links alone: Share/, its two exceptions and its tests, which stay clean). phpstan-baseline.neon
+# holds what the rest of the core had when it came in; new code adds nothing to it, and
+# glitchr-studio/ci's job fails on any other error.
 includes:
     - phpstan-baseline.neon
 
 parameters:
     level: max
     paths:
-        - Share
-        - Exception/InvalidShareableException.php
-        - Exception/UnknownNetworkException.php
-        - Tests/Share
+        - .
+    excludePaths:
+        - docker/
+        - vendor/ (?)

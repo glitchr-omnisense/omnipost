@@ -7,7 +7,11 @@ order: 70
 
 `docker/` runs this package with every `omnipost/*` provider installed - from GitHub (branch 1.x),
 or from the checkouts beside this one when `OMNIPOST_PLUGINS=../..` is set in `docker/.env` - and
-a console that exercises them with the tokens in `docker/.env`.
+a console that exercises them with the tokens in `docker/.env`. omnisense/contracts, the kernel
+the family builds on, comes from its checkout when `OMNISENSE_CONTRACTS` names it in
+`docker/.env` (its tests then run with the family's), from GitHub otherwise. The service runs on
+Docker's default bridge (no network created); its image may be another family's harness tagged,
+the entrypoint being named in `compose.yml`.
 
 ```sh
 cd docker && cp .env.dist .env       # your accounts' tokens, when you have them
@@ -28,6 +32,7 @@ docker compose run --rm omnipost providers
 | `bare` | plain PHP: the registry built by hand, two posts checked, YouTube asked, what PHP loaded |
 | `bare-share` | plain PHP: every share link of a page, as JSON, and every class PHP loaded for it |
 | `test` | every package's tests |
+| `phpstan` | PHPStan at level max on the core and each provider, over each one's `phpstan-baseline.neon` |
 
 `docker compose run --rm js` runs the share script's tests (`Tests/js/share.test.cjs`) on node's
 test runner, in a `node:22-alpine` container.
@@ -100,9 +105,11 @@ volume of the `omnipost-harness` project.
 `docker/entrypoint.sh` runs `docker/harness/setup.php` first: it writes the harness's
 `composer.json` and `phpunit.xml` in the `harness` volume - this core from its checkout, each
 provider from its checkout under `OMNIPOST_PLUGINS` when one is there, from
-`https://github.com/glitchr-omnisense/omnipost-<slug>.git` (branch 1.x) otherwise. Then
+`https://github.com/glitchr-omnisense/omnipost-<slug>.git` (branch 1.x) otherwise, and
+omnisense/contracts the same way from `/omnisense/contracts`; each provider is linked under
+`/harness/packages/<slug>` for PHPStan. Then
 `composer install` the first time, `composer update` when `composer.json` is newer than the lock,
-and the command: `test` (PHPUnit), `bare`, `bare-share`, `composer`, `sh` or `php` as they are, anything else the
+and the command: `test` (PHPUnit), `bare`, `bare-share`, `phpstan`, `composer`, `sh` or `php` as they are, anything else the
 console (`docker/harness/bin/omnipost`, `providers` by default).
 
 The image (`omnisense/omnipost-harness`) is built from `docker/Dockerfile` the first time

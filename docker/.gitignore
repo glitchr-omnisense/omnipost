@@ -1,3 +1,5 @@
 .env
 plugins/*
 !plugins/.gitkeep
+contracts/*
+!contracts/.gitkeep

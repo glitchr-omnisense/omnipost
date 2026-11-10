@@ -2,8 +2,8 @@
 
 namespace Omnipost\Exception;
 
-/** The provider does not do that (no feed, no deletion, no scheduling...). */
-final class NotSupportedException extends \LogicException implements OmnipostException
+/** The provider does not do that (no feed, no deletion, no scheduling...): a LogicException, as before (omnisense/contracts' NotSupportedException). */
+final class NotSupportedException extends \Omnisense\Contracts\Exception\NotSupportedException implements OmnipostException
 {
     public static function operation(string $provider, string $operation): self
     {

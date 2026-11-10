@@ -2,8 +2,34 @@
 
 ## [Unreleased]
 
+### Changed
+
+- omnisense/omnipost on omnisense/contracts, the kernel of the omni families, with usage policies;
+  the public API unchanged. `Config` and `Http\Redaction` are thin subclasses of the kernel's
+  (prefix `omnipost`); `OmnipostException` extends its `ExceptionInterface`,
+  `InvalidConfigException` and `NotSupportedException` its own (LogicExceptions as before).
+  `ProviderInterface`, `ProviderFactory` and `Registry` stay omnipost's (a feed has no
+  capabilities, so a provider is not the kernel's `ProviderInterface`), on the kernel's Config,
+  Backoff and PolicyGuard: `ProviderFactory::create()` gives the provider's wait in its Config
+  (`Config::backoff()`), over the registry's limiter.
+- PHPStan analyses the whole core (the share links alone before); `phpstan-baseline.neon` holds the
+  103 errors the rest had when it came in.
+
 ### Added
 
+- `Registry::publisher()` and `feed()`: the provider behind its guard (`Policy\GuardedPublisher`,
+  `Policy\GuardedFeed`): a call over a limit refused with nothing sent
+  (`Exception\UsageLimitReachedException`), counted after unless nothing was sent, never retried;
+  `guard()`, `policy()`, `policies()`; `policy` and `usage` beside a provider's options (or in
+  them), a shared `RateLimiterInterface` as the registry's third argument; the bundle takes
+  `policy`, `usage` and `limiter`.
+- `Exception\RateLimitedException` (a `ProviderException`, with `retryAfter`) and `Http\Throttle`:
+  a provider's API client keeps the waits its network asks for and refuses the next calls while
+  one lasts.
+- `docs/policies.md`: each provider's policy, the guard, a site's tightening, why a post is never
+  sent twice (and Symfony's `retry_failed`, which would). The harness installs omnisense/contracts
+  from its checkout (`OMNISENSE_CONTRACTS`) or GitHub, runs PHPStan (`phpstan`) on every package,
+  names its entrypoint and runs on Docker's default bridge.
 - CI: `.github/workflows/ci.yml`, glitchr-studio/ci's package job as omnishare had it (the package installed alone,
   PHPUnit, PHPStan, a consumer install that autoloads `Omnipost\Share\Registry`); `phpunit.xml.dist` (the core's
   suite, `Tests/`) and `phpstan-baseline.neon`, empty: any error of the paths phpstan.neon analyses fails the job.

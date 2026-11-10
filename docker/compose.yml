@@ -16,25 +16,36 @@
 #
 # Providers come from GitHub (branch 1.x) unless their checkout sits under
 # OMNIPOST_PLUGINS (set it to ../.. in .env when this core sits in the
-# workspace beside them): then that checkout is what runs.
+# workspace beside them): then that checkout is what runs. omnisense/contracts
+# likewise: its checkout under OMNISENSE_CONTRACTS (../../../omnisense-contracts
+# in .env when it sits beside the family's folder), its tests run with the
+# family's; GitHub otherwise.
 name: omnipost-harness
 
 services:
   omnipost:
     build: .
     image: omnisense/omnipost-harness
+    # The image may be another family's harness tagged (PHP 8.4 with Composer): the entrypoint is
+    # named here, not taken from the image.
+    entrypoint: ["/omnipost/core/docker/entrypoint.sh"]
+    # One service, no server beside it: Docker's default bridge, no network of its own to create.
+    network_mode: bridge
     env_file:
       - path: .env
         required: false
     volumes:
       - ..:/omnipost/core
       - ${OMNIPOST_PLUGINS:-./plugins}:/omnipost/plugins:ro
+      - ${OMNISENSE_CONTRACTS:-./contracts}:/omnisense/contracts:ro
       - harness:/harness
 
   js:
     image: node:22-alpine
     working_dir: /omnipost/core
     command: ["node", "--test", "Tests/js/share.test.cjs"]
+    # Nothing to reach: no network at all.
+    network_mode: none
     volumes:
       - ..:/omnipost/core:ro
 

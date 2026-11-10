@@ -97,6 +97,8 @@ network that has both keeps its share link in the core and gets publishing from 
 - Usage: [publishing](usage-publishing.md), [validating a post](usage-validation.md),
   [reading an account](usage-reading.md), [tokens and connecting an account](usage-tokens.md).
 - [Configuration reference](configuration.md): every option of every factory.
+- [Usage policies](policies.md): what each network's terms allow, declared as data, the guard,
+  a site's tightening; a post never sent twice.
 - [Errors](errors.md): the exceptions and when each is thrown.
 - [Testing](testing.md): testing an application that uses Omnipost.
 - [The Docker harness](harness.md): every provider installed, a console to call them.

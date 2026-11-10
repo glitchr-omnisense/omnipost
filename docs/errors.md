@@ -6,7 +6,7 @@ order: 50
 # Errors
 
 Every exception implements `Omnipost\Exception\OmnipostException` (an interface that extends
-`\Throwable`).
+omnisense/contracts' `ExceptionInterface`, a `\Throwable`).
 
 | Exception | Parent | Thrown when |
 |---|---|---|
@@ -15,6 +15,8 @@ Every exception implements `Omnipost\Exception\OmnipostException` (an interface 
 | `NotSupportedException` | `\LogicException` | the provider does not do that (Instagram's `delete()`, a kind it cannot publish) |
 | `ProviderException` | `\RuntimeException` | the network refused the call, could not be reached, or answered without what was expected |
 | `UnauthorizedException` | `ProviderException` | the token is dead or refused: the account must be connected again |
+| `RateLimitedException` | `ProviderException` | the network refused the call for its rate or quota (a 429, Meta's codes 4, 17, 32, 613, 80002, Google's `quotaExceeded`, `rateLimitExceeded`...): `retryAfter` when it said a wait, which then holds the next calls |
+| `UsageLimitReachedException` | omnisense/contracts' `UsageLimitReached` | refused before anything was sent: a limit of the provider's usage policy is reached, or the network's wait lasts (`retryAfter`, `limit`) - see [Usage policies](policies.md) |
 
 ## Properties and messages
 
@@ -54,8 +56,10 @@ InvalidConfigException: The "youtube" provider needs: client_id, client_secret, 
 
 **Instagram** (`omnipost/instagram`, `Api::error()`): an answer of 400 or more, or one carrying
 `error` / `error_type`, is an exception. HTTP 401, Graph code 190, or subcode 463 or 467 is
-`UnauthorizedException`; codes 4, 17, 32 and 613 (Meta's call limits, `Api::RATE_LIMIT_CODES`) a
-`ProviderException` whose message starts `Too many calls, try again later:`; anything else a
+`UnauthorizedException`; a 429 and codes 4, 17, 32, 613 and 80002 (Meta's call limits,
+`Api::RATE_LIMIT_CODES`) a `RateLimitedException` whose message starts `Too many calls, try again
+later:`, its `retryAfter` from X-Business-Use-Case-Usage's `estimated_time_to_regain_access`
+(minutes) or a Retry-After, the wait then holding the next calls; anything else a
 `ProviderException` with Graph's code as `providerCode`. A transport error is a `ProviderException`
 **not chained** to the client's exception, and every `access_token=`, `client_secret=` and `code=`
 in a message is masked (`***`): the URL in a transport message carries the token.
@@ -63,8 +67,10 @@ in a message is masked (`***`): the URL in a transport message carries the token
 **YouTube** (`omnipost/youtube`, `Api::decode()`): an answer of 400 or more, or one carrying
 `error`, is an exception. The reason is the API's first `errors[].reason`, or the token endpoint's
 `error`. HTTP 401, or the reasons `invalid_grant`, `invalid_client`, `unauthorized_client`,
-`authError`, is `UnauthorizedException`; anything else a `ProviderException` with the reason as
-`providerCode` (`quotaExceeded`, `insufficientPermissions`...). A transport error is a
+`authError`, is `UnauthorizedException`; a 429 and the reasons in `Api::RATE_LIMIT_REASONS`
+(`quotaExceeded`, `rateLimitExceeded`, `userRateLimitExceeded`, `dailyLimitExceeded`,
+`uploadLimitExceeded`) a `RateLimitedException`; anything else a `ProviderException` with the
+reason as `providerCode`. A transport error is a
 `ProviderException` chained to the client's exception. Other cases: no upload URL in the answer,
 the video's file unreadable, the video's URL answering other than 200, a status asked for a video
 that does not exist (404, `videoNotFound`), a channel not found (404, `channelNotFound`), no
@@ -80,6 +86,7 @@ use Omnipost\Exception\InvalidPostException;
 use Omnipost\Exception\NotSupportedException;
 use Omnipost\Exception\ProviderException;
 use Omnipost\Exception\UnauthorizedException;
+use Omnipost\Exception\UsageLimitReachedException;
 
 try {
     $publication = $provider->publish($post->for($provider->getPlatform()));
@@ -91,8 +98,11 @@ try {
     // this provider is declared, not configured (no token yet)
 } catch (NotSupportedException) {
     // this network does not do that
+} catch (UsageLimitReachedException $e) {
+    // nothing sent: a limit of the policy, or the network's wait; $e->retryAfter seconds
 } catch (ProviderException $e) {
-    // the network refused, or could not be reached: $e->status, $e->providerCode; retry later
+    // the network refused, or could not be reached: $e->status, $e->providerCode. Nothing was
+    // retried: read status() before sending the post again, so that it goes out once.
 }
 ```
 
