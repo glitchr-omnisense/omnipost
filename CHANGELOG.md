@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- A post is never published twice by the site's HTTP client: `ProviderFactory` keeps the client it
+  is given (the bundle's `http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`,
+  which omnisense/contracts 1568f2c brings; with an older kernel the client is kept as given), so
+  Symfony's `RetryableHttpClient` (`retry_failed`) no longer resends a publish answered 429, 502 or
+  503. A `MockHttpClient` is kept as given. docs/policies.md. The public API is unchanged.
+
 ### Changed
 
 - omnisense/omnipost on omnisense/contracts, the kernel of the omni families, with usage policies;

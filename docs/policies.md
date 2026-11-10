@@ -62,6 +62,10 @@ Nothing in omnipost retries: not the guard, not the wait, not the API clients. A
 before a call, never after a refusal; an upload that failed is not resumed nor started again; an
 Instagram container is published by one `media_publish`. A post refused (429, 5xx, a lost answer)
 is the caller's to send again, once it has checked it did not go out (`status()`): neither network
-offers an idempotency key for a post. One thing to keep that way: the HTTP client a site gives.
-Symfony's `framework.http_client.retry_failed` retries 423, 425, 429, 502 and 503 for every method,
-POST included: a site that turns it on gives omnipost a scoped client without it.
+offers an idempotency key for a post. The HTTP client a site gives is kept that
+way too: Symfony's `framework.http_client.retry_failed` retries 423, 425, 429, 502 and 503 for
+every method, POST included, so the factory keeps the client it is given (the bundle's
+`http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`, which
+omnisense/contracts 1568f2c brings). A test client (`MockHttpClient`) is kept as given. With an
+older kernel the client is kept as given: a site that turns `retry_failed` on then gives omnipost
+a scoped client without it.

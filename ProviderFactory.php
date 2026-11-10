@@ -3,6 +3,7 @@
 namespace Omnipost;
 
 use Omnipost\Exception\UsageLimitReachedException;
+use Omnisense\Contracts\Http\NoRetry;
 use Omnisense\Contracts\Policy\Backoff;
 use Omnisense\Contracts\Policy\InMemoryRateLimiter;
 use Omnisense\Contracts\Policy\RateLimiterInterface;
@@ -24,6 +25,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * or an in-memory one): the factory gives it to the provider's API client,
  * which then refuses a call while the network's Retry-After or rate-limit
  * answer lasts. Nothing in it retries: a post refused is never sent again.
+ * Nor does the HTTP client given: it is kept with its retries off
+ * (omnisense/contracts' Http\NoRetry), so Symfony's RetryableHttpClient never
+ * publishes a post twice.
  *
  * Omnipost's providers are not omnisense/contracts' ProviderInterface (they
  * have no getTitle() nor capabilities() of the kernel's shape: a feed has no
@@ -32,8 +36,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class ProviderFactory implements ProviderFactoryInterface
 {
-    public function __construct(protected readonly ?HttpClientInterface $http = null)
+    protected readonly ?HttpClientInterface $http;
+
+    public function __construct(?HttpClientInterface $http = null)
     {
+        // Http\NoRetry came with omnisense/contracts 1568f2c: a site whose vendor holds an older one keeps its client as given.
+        $this->http = null !== $http && class_exists(NoRetry::class) ? NoRetry::of($http) : $http;
     }
 
     public function getName(): string
