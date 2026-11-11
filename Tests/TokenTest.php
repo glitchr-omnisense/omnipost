@@ -38,7 +38,9 @@ final class TokenTest extends TestCase
 
         self::assertSame(['access_token' => 'IGQ...', 'expires_at' => '2026-05-01T10:00:00+00:00', 'refresh_token' => '1//refresh', 'scopes' => ['instagram_business_basic'], 'account_id' => '178414'], $array);
         self::assertEquals($token, Token::fromArray($array));
-        self::assertEquals($token, Token::fromArray(json_decode((string) json_encode($array), true)), 'through JSON, as a site stores it');
+        $stored = json_decode((string) json_encode($array), true);
+        self::assertIsArray($stored);
+        self::assertEquals($token, Token::fromArray($stored), 'through JSON, as a site stores it');
     }
 
     public function testWhatIsNotKnownIsLeftOutOfTheArray(): void

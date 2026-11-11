@@ -23,7 +23,9 @@ final class RegistryTest extends TestCase
         self::assertTrue($registry->has('fediverse'));
         self::assertFalse($registry->has('tiktok'));
         self::assertSame($registry->get('fediverse'), $registry->get('fediverse'));
-        self::assertSame('a', $registry->get('fediverse')->token);
+        $fediverse = $registry->get('fediverse');
+        self::assertInstanceOf(StubPublisher::class, $fediverse);
+        self::assertSame('a', $fediverse->token);
         self::assertSame(['fediverse', 'wall'], $registry->names());
         self::assertSame(['fediverse', 'wall'], array_keys($registry->all()));
         self::assertSame(['stub', 'wall'], $registry->factories());
@@ -45,8 +47,11 @@ final class RegistryTest extends TestCase
         self::assertSame(['token' => 'a'], $registry->options('fediverse'));
         $stored = $registry->create('fediverse', ['token' => 'b']);
         self::assertNotSame($registry->get('fediverse'), $stored);
+        self::assertInstanceOf(StubPublisher::class, $stored);
         self::assertSame('b', $stored->token);
-        self::assertSame('a', $registry->get('fediverse')->token);
+        $fediverse = $registry->get('fediverse');
+        self::assertInstanceOf(StubPublisher::class, $fediverse);
+        self::assertSame('a', $fediverse->token);
     }
 
     public function testAnUnknownProviderSaysWhichAreConfigured(): void
@@ -78,6 +83,7 @@ final class RegistryTest extends TestCase
     {
         $provider = (new StubFactory())->create(['token' => 't', 'handle' => null]);
 
+        self::assertInstanceOf(StubPublisher::class, $provider);
         self::assertSame('stub', $provider->handle);
         self::assertSame('stub', (new StubFactory())->getName());
     }

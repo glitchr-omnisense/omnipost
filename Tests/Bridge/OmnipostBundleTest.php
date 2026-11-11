@@ -4,6 +4,7 @@ namespace Omnipost\Tests\Bridge;
 
 use Omnipost\Bridge\Symfony\OmnipostBundle;
 use Omnipost\Exception\InvalidConfigException;
+use Omnipost\FeedInterface;
 use Omnipost\Instagram\InstagramProviderFactory;
 use Omnipost\Model\Media;
 use Omnipost\Model\Post;
@@ -42,14 +43,18 @@ final class OmnipostBundleTest extends TestCase
         ]);
 
         $registry = $container->get(Registry::class);
+        self::assertInstanceOf(Registry::class, $registry);
         self::assertSame(['fediverse'], $registry->names());
 
         $site = $container->get(Site::class);
+        self::assertInstanceOf(Site::class, $site);
         self::assertSame($registry, $site->registry, 'the registry autowired');
         self::assertInstanceOf(Validator::class, $site->validator);
         self::assertSame($registry->get('fediverse'), $site->fediverse, 'injected by its name, as what it does');
         self::assertSame('post_f_1', $site->fediverse->publish(Post::reel(Media::video('https://site.example/reel.mp4')))->id);
-        self::assertSame($registry->get('fediverse'), $container->get(Wall::class)->fediverse, 'and as a provider');
+        $wall = $container->get(Wall::class);
+        self::assertInstanceOf(Wall::class, $wall);
+        self::assertSame($registry->get('fediverse'), $wall->fediverse, 'and as a provider');
     }
 
     public function testAProviderWithNoTokenBreaksNothingUntilACallNeedsIt(): void
@@ -64,6 +69,7 @@ final class OmnipostBundleTest extends TestCase
         ]);
 
         $registry = $container->get(Registry::class);
+        self::assertInstanceOf(Registry::class, $registry);
         self::assertTrue($registry->has('instagram'));
         self::assertSame(['instagram', 'youtube', 'fediverse'], $registry->names());
         $factories = $registry->factories();
@@ -75,6 +81,7 @@ final class OmnipostBundleTest extends TestCase
         self::assertTrue($instagram->capabilities()->supports(PostKind::REEL), 'what needs no token works');
         self::assertCount(3, $registry->publishers());
         self::assertCount(2, $registry->feeds());
+        self::assertInstanceOf(FeedInterface::class, $instagram);
 
         try {
             $instagram->account();
@@ -84,7 +91,9 @@ final class OmnipostBundleTest extends TestCase
         }
         $this->expectException(InvalidConfigException::class);
         $this->expectExceptionMessage('The "youtube" provider needs: api_key');
-        $registry->get('youtube')->account();
+        $youtube = $registry->get('youtube');
+        self::assertInstanceOf(FeedInterface::class, $youtube);
+        $youtube->account();
     }
 
     /** @param array<string, array{factory: string, options?: array<string, mixed>}> $providers */
@@ -102,6 +111,7 @@ final class OmnipostBundleTest extends TestCase
         if (!is_dir($dir)) {
             return;
         }
+        /** @var \SplFileInfo $file */
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $file) {
             $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
         }

@@ -11,6 +11,7 @@ use Omnipost\Platform;
  */
 final class Publication
 {
+    /** @param array<mixed> $raw */
     public function __construct(
         public readonly Platform $platform,
         public readonly string $id,

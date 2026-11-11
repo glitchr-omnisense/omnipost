@@ -22,6 +22,12 @@
   (`Config::backoff()`), over the registry's limiter.
 - PHPStan analyses the whole core (the share links alone before); `phpstan-baseline.neon` holds the
   103 errors the rest had when it came in.
+- PHPStan at level max with an empty baseline, types only: the models' arrays typed where they are
+  declared (`Capabilities`, `FeedItem`, `Variant` in their constructors' PHPDoc, `Post::reel()`,
+  `image()`, `carousel()`'s tags, the `$raw` answers `array<mixed>`, `Token::toArray()`'s shape);
+  `Token::fromArray()` reads what a site stored without trusting it: the same values, but a scope
+  that is not a string is cast to one (an array to ""), the scopes a list, and an access token that
+  is not a scalar is "" rather than "Array".
 
 ### Added
 

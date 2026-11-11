@@ -6,6 +6,7 @@ use Omnipost\Bridge\Symfony\OmnipostBundle;
 use Omnipost\Instagram\InstagramProviderFactory;
 use Omnipost\Registry;
 use Omnipost\YouTube\YouTubeProviderFactory;
+use Omnisense\Contracts\Http\Data;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
@@ -29,14 +30,14 @@ final class BareTest extends TestCase
         [$status, $report] = self::php([__DIR__.'/../docker/harness/bin/bare', '--recorded', '--json']);
 
         self::assertSame(0, $status);
-        self::assertContains(Registry::class, $report['symbols'], 'the registry was built there');
+        self::assertContains(Registry::class, self::list($report['symbols']), 'the registry was built there');
         self::assertSame([], self::framework($report), 'no class nor file of a framework');
-        $installed = array_values(array_filter(array_column(require __DIR__.'/../docker/harness/plugins.php', 1), 'class_exists'));
+        $installed = array_values(array_filter(array_column(self::list(require __DIR__.'/../docker/harness/plugins.php'), 1), static fn (mixed $factory): bool => \is_string($factory) && class_exists($factory)));
         foreach ($installed as $factory) {
-            self::assertContains($factory, $report['symbols'], 'every provider package installed, its factory built');
+            self::assertContains($factory, self::list($report['symbols']), 'every provider package installed, its factory built');
         }
-        self::assertCount(\count($installed), $report['factories']);
-        self::assertCount(\count($installed), $report['providers'], 'and its provider, with no token');
+        self::assertCount(\count($installed), self::list($report['factories']));
+        self::assertCount(\count($installed), self::list($report['providers']), 'and its provider, with no token');
     }
 
     public function testAPostIsCheckedAgainstWhatEachNetworkAcceptsWithNoClassOfAFrameworkLoaded(): void
@@ -47,9 +48,10 @@ final class BareTest extends TestCase
         [$status, $report] = self::php([__DIR__.'/../docker/harness/bin/bare', '--recorded', '--json']);
 
         self::assertSame(0, $status);
-        self::assertSame(['platform' => 'instagram', 'publishes' => true, 'feed' => true], $report['providers']['instagram']);
-        self::assertSame([], $report['posts']['a vertical reel of 42 seconds']['instagram']);
-        self::assertSame(['media[0].ratio: 16:9 is not accepted (accepted: 9:16, 4:5, 1:1).'], $report['posts']['a landscape reel of twelve minutes']['instagram']);
+        $data = Data::of($report);
+        self::assertSame(['platform' => 'instagram', 'publishes' => true, 'feed' => true], $data->get('providers.instagram'));
+        self::assertSame([], $data->get('posts.a vertical reel of 42 seconds.instagram'));
+        self::assertSame(['media[0].ratio: 16:9 is not accepted (accepted: 9:16, 4:5, 1:1).'], $data->get('posts.a landscape reel of twelve minutes.instagram'));
         self::assertSame([], self::framework($report), 'no class nor file of a framework');
     }
 
@@ -61,15 +63,17 @@ final class BareTest extends TestCase
         [$status, $report] = self::php([__DIR__.'/../docker/harness/bin/bare', '--recorded', '--json']);
 
         self::assertSame(0, $status);
+        $data = Data::of($report);
         self::assertTrue($report['recorded']);
-        self::assertSame(['id' => 'UCabc', 'username' => '@claireviolin', 'name' => 'Claire', 'url' => 'https://www.youtube.com/@claireviolin', 'followers' => 4200, 'posts' => 36], $report['youtube']['account']);
-        self::assertSame(['shortA', 'longB'], array_column($report['youtube']['items'], 'id'));
-        self::assertSame(['reel', 'video'], array_column($report['youtube']['items'], 'kind'), 'three minutes at most is a Short');
-        self::assertSame([58, 3723], array_map('intval', array_column($report['youtube']['items'], 'duration')));
-        self::assertSame('CAUQAA', $report['youtube']['next']);
-        self::assertSame([], $report['posts']['a vertical reel of 42 seconds']['youtube'], 'its variant gives the title');
-        self::assertSame(['title: A title is required.'], $report['posts']['a landscape reel of twelve minutes']['youtube']);
-        self::assertContains('Symfony\\Component\\HttpClient\\MockHttpClient', $report['symbols'], 'the answers came through the HTTP client given');
+        self::assertSame(['id' => 'UCabc', 'username' => '@claireviolin', 'name' => 'Claire', 'url' => 'https://www.youtube.com/@claireviolin', 'followers' => 4200, 'posts' => 36], $data->get('youtube.account'));
+        $items = self::list($data->get('youtube.items'));
+        self::assertSame(['shortA', 'longB'], array_column($items, 'id'));
+        self::assertSame(['reel', 'video'], array_column($items, 'kind'), 'three minutes at most is a Short');
+        self::assertSame([58, 3723], array_map(static fn (mixed $duration): int => \is_scalar($duration) ? (int) $duration : 0, array_column($items, 'duration')));
+        self::assertSame('CAUQAA', $data->get('youtube.next'));
+        self::assertSame([], $data->get('posts.a vertical reel of 42 seconds.youtube'), 'its variant gives the title');
+        self::assertSame(['title: A title is required.'], $data->get('posts.a landscape reel of twelve minutes.youtube'));
+        self::assertContains('Symfony\\Component\\HttpClient\\MockHttpClient', self::list($report['symbols']), 'the answers came through the HTTP client given');
         self::assertSame([], self::framework($report), 'no class nor file of a framework');
     }
 
@@ -88,13 +92,34 @@ final class BareTest extends TestCase
     }
 
     /**
-     * @param array{symbols: list<string>, files: list<string>} $report
+     * @param array<mixed> $report its "symbols" and "files", lists of strings
      *
      * @return list<string> the classes, interfaces, traits and files of a framework among those loaded
      */
     private static function framework(array $report): array
     {
-        return [...array_values(preg_grep(self::FRAMEWORK, $report['symbols'])), ...array_values(preg_grep(self::FRAMEWORK_FILES, $report['files']))];
+        $framework = [];
+        foreach ([self::FRAMEWORK => 'symbols', self::FRAMEWORK_FILES => 'files'] as $pattern => $key) {
+            foreach (self::list($report[$key] ?? null) as $name) {
+                if (\is_string($name) && preg_match($pattern, $name)) {
+                    $framework[] = $name;
+                }
+            }
+        }
+
+        return $framework;
+    }
+
+    /**
+     * A list of the report, asserted to be one.
+     *
+     * @return array<mixed>
+     */
+    private static function list(mixed $value): array
+    {
+        self::assertIsArray($value);
+
+        return $value;
     }
 
     /**
@@ -102,7 +127,7 @@ final class BareTest extends TestCase
      *
      * @param list<string> $arguments
      *
-     * @return array{int, array<string, mixed>} the exit status, the JSON printed
+     * @return array{int, array<mixed>} the exit status, the JSON printed
      */
     private static function php(array $arguments): array
     {

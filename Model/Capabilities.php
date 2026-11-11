@@ -6,14 +6,15 @@ namespace Omnipost\Model;
  * What a network accepts, for the Validator to check a post before it is
  * sent: the kinds, the video's bounds, the ratios, the caption's length,
  * the hashtags, whether a title is required.
- *
- * @param list<PostKind> $kinds
- * @param list<string>   $aspectRatios "9:16", "1:1", "4:5", "16:9"... empty: any
- * @param list<string>   $videoFormats mime types or extensions
- * @param list<string>   $imageFormats
  */
 final class Capabilities
 {
+    /**
+     * @param list<PostKind> $kinds
+     * @param list<string>   $aspectRatios "9:16", "1:1", "4:5", "16:9"... empty: any
+     * @param list<string>   $videoFormats mime types or extensions
+     * @param list<string>   $imageFormats
+     */
     public function __construct(
         public readonly array $kinds,
         public readonly ?float $minDuration = null,

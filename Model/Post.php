@@ -32,17 +32,22 @@ final class Post
     ) {
     }
 
+    /** @param list<string> $tags */
     public static function reel(Media $video, string $caption = '', ?string $title = null, array $tags = []): self
     {
         return new self(PostKind::REEL, [$video], $caption, $title, $tags, $video->coverUrl);
     }
 
+    /** @param list<string> $tags */
     public static function image(Media $image, string $caption = '', array $tags = []): self
     {
         return new self(PostKind::IMAGE, [$image], $caption, null, $tags);
     }
 
-    /** @param list<Media> $media */
+    /**
+     * @param list<Media>  $media
+     * @param list<string> $tags
+     */
     public static function carousel(array $media, string $caption = '', array $tags = []): self
     {
         return new self(PostKind::CAROUSEL, $media, $caption, null, $tags);

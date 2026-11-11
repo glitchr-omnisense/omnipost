@@ -30,7 +30,7 @@ final class StubFactory extends ProviderFactory
 
     protected function build(Config $config): ProviderInterface
     {
-        return new StubPublisher((string) $config['token'], (string) $config['handle']);
+        return new StubPublisher($config->string('token') ?? '', $config->string('handle') ?? '');
     }
 }
 
@@ -44,7 +44,7 @@ final class StubWallFactory extends ProviderFactory
 
     protected function build(Config $config): ProviderInterface
     {
-        return new StubWall((string) $config['handle']);
+        return new StubWall($config->string('handle') ?? '');
     }
 }
 
