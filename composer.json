@@ -8,10 +8,12 @@
     "require": {
         "php": ">=8.2",
         "ext-mbstring": "*",
-        "omnisense/contracts": "^1.0@dev",
+        "omnisense/contracts": "^1.0",
         "symfony/http-client-contracts": "^3.0"
     },
     "require-dev": {
+        "omnipost/instagram": "^1.0@dev",
+        "omnipost/youtube": "^1.0@dev",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.0",
         "symfony/config": "^6.4|^7.0|^8.0",
@@ -37,5 +39,10 @@
     "autoload-dev": {
         "psr-4": {"Omnipost\\Tests\\": "Tests/"}
     },
-    "config": {"sort-packages": true}
+    "config": {"sort-packages": true},
+    "extra": {
+        "branch-alias": {
+            "dev-1.x": "1.x-dev"
+        }
+    }
 }

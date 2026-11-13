@@ -9,6 +9,8 @@ on:
     branches: ['1.x']
   pull_request:
   workflow_dispatch:
+  # release.yml runs this CI on a tag before the release.
+  workflow_call:
 
 permissions:
   contents: read

@@ -40,8 +40,7 @@ abstract class ProviderFactory implements ProviderFactoryInterface
 
     public function __construct(?HttpClientInterface $http = null)
     {
-        // Http\NoRetry came with omnisense/contracts 1568f2c: a site whose vendor holds an older one keeps its client as given.
-        $this->http = null !== $http && class_exists(NoRetry::class) ? NoRetry::of($http) : $http;
+        $this->http = null !== $http ? NoRetry::of($http) : null;
     }
 
     public function getName(): string

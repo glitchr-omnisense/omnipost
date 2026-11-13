@@ -65,7 +65,5 @@ is the caller's to send again, once it has checked it did not go out (`status()`
 offers an idempotency key for a post. The HTTP client a site gives is kept that
 way too: Symfony's `framework.http_client.retry_failed` retries 423, 425, 429, 502 and 503 for
 every method, POST included, so the factory keeps the client it is given (the bundle's
-`http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`, which
-omnisense/contracts 1568f2c brings). A test client (`MockHttpClient`) is kept as given. With an
-older kernel the client is kept as given: a site that turns `retry_failed` on then gives omnipost
-a scoped client without it.
+`http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`). A test client
+(`MockHttpClient`) is kept as given.

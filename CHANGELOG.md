@@ -2,11 +2,21 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-13
+
+The first stable release.
+
+### Release
+
+- Requires `omnisense/contracts: ^1.0`: stable versions, so `composer require omnisense/omnipost`
+  installs in a project at Composer's default minimum-stability. `extra.branch-alias` names 1.x
+  (`1.x-dev`); the CI (`.github/workflows/ci.yml`, glitchr-studio/ci's php-package.yml) is callable, and
+  `release.yml` runs it on a tag before glitchr-studio/ci's php-release.yml.
+
 ### Fixed
 
 - A post is never published twice by the site's HTTP client: `ProviderFactory` keeps the client it
-  is given (the bundle's `http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`,
-  which omnisense/contracts 1568f2c brings; with an older kernel the client is kept as given), so
+  is given (the bundle's `http_client`) with its retries off (omnisense/contracts' `Http\NoRetry`), so
   Symfony's `RetryableHttpClient` (`retry_failed`) no longer resends a publish answered 429, 502 or
   503. A `MockHttpClient` is kept as given. docs/policies.md. The public API is unchanged.
 

@@ -81,13 +81,57 @@ WhatsApp, Telegram, Reddit, the e-mail, the copied link and the device's share s
 only; Instagram, YouTube and TikTok are publish only. The table per network:
 [docs/index.md](docs/index.md#the-contracts-per-network).
 
-## Install
+## Install and a first call
+
+```sh
+composer require omnisense/omnipost
+```
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Omnipost\Share\Registry;
+use Omnipost\Share\Shareable;
+
+$share = Registry::defaults()->share(new Shareable('https://example.com/articles/fuji', 'Mount Fuji at dawn'), ['x', 'email']);
+echo $share->url('x'), "\n";   // https://twitter.com/intent/tweet?url=https%3A%2F%2Fexample.com%2Farticles%2Ffuji&text=Mount%20Fuji%20at%20dawn
+```
+
+The share links need nothing: no account, no key, no request (see [Share links](#share-links)).
+Publishing and reading a feed go through a network's API, and **every network needs an account for
+a real call**: Instagram a professional account and a Meta app (its access token; the account added
+as an Instagram Tester while the app is in development mode), YouTube an API key for a channel's
+public videos and an OAuth client (Google Cloud) to upload. The first call of a provider, on
+YouTube's recorded answer, so that it runs without a key and nothing leaves the process:
+
+```sh
+composer require omnisense/omnipost omnipost/youtube
+```
+
+```php
+use Omnipost\Registry;
+use Omnipost\YouTube\YouTubeProviderFactory;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+
+$http = new MockHttpClient(new MockResponse(json_encode(['items' => [['id' => 'UCabc', 'snippet' => ['title' => 'Claire', 'customUrl' => '@claireviolin'],
+    'statistics' => ['subscriberCount' => '4200', 'videoCount' => '36'], 'contentDetails' => ['relatedPlaylists' => ['uploads' => 'UUabc']]]]]),
+    ['response_headers' => ['Content-Type' => 'application/json']]));
+$registry = new Registry([new YouTubeProviderFactory($http)], ['youtube' => ['factory' => 'youtube', 'options' => ['api_key' => 'not-a-key', 'channel_id' => 'UCabc']]]);
+$account = $registry->get('youtube')->account();
+echo $account->username, ', ', $account->followers, " subscribers\n";   // @claireviolin, 4200 subscribers
+```
+
+With `HttpClient::create()` (or the application's client), a key and a channel's id, the same lines
+read the real channel.
+
+## Plain PHP
 
 ```sh
 composer require omnisense/omnipost omnipost/instagram omnipost/youtube
 ```
-
-## Plain PHP
 
 ```php
 require __DIR__.'/vendor/autoload.php';
@@ -112,8 +156,8 @@ foreach ($registry->publishers() as $publisher) {
 ```
 
 A factory takes the HTTP client to call with - the application's, a `MockHttpClient` in a test -
-and makes its own when given none. A whole script that runs as it is, and the rest:
-[docs/installation.md](docs/installation.md). No class of a framework is loaded on the way:
+and makes its own when given none. A whole script that runs as it is, on recorded answers, and the
+rest: [docs/installation.md](docs/installation.md). No class of a framework is loaded on the way:
 `Tests/BareTest.php` checks it in a process of its own, and so does
 `docker compose run --rm omnipost bare`.
 

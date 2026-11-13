@@ -189,7 +189,7 @@ The shipped providers' layout, to copy:
 
 - name `omnipost/<slug>`, namespace `Omnipost\<Network>\`, PSR-4 from the package root, `Tests/`
   excluded from the class map;
-- `require`: `php` `>=8.2`, `omnisense/omnipost` `^1.0@dev`, `symfony/http-client`
+- `require`: `php` `>=8.2`, `omnisense/omnipost` `^1.0`, `symfony/http-client`
   (`^6.4|^7.0|^8.0`);
 - an `Api` class that holds the token, adds it to each call, and maps the network's errors; the
   provider class on top, with `validate()` public;
